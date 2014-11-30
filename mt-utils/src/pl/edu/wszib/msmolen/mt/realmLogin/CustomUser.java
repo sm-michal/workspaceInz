@@ -1,0 +1,52 @@
+package pl.edu.wszib.msmolen.mt.realmLogin;
+
+import java.util.List;
+
+import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.display.MenuItem;
+
+public class CustomUser implements CustomPrincipal
+{
+	private final String mName;
+	private final User mUserObject;
+	private final List<MenuItem> mMenuItems;
+	private final List<CustomRole> mRoles;
+
+	protected CustomUser(int pmId, String pmName, String pmPassword, List<MenuItem> pmMenuItems, List<CustomRole> pmRoles)
+	{
+		mName = pmName;
+		mUserObject = new User(pmId, pmName, pmPassword.toCharArray());
+		mMenuItems = pmMenuItems;
+		mRoles = pmRoles;
+	}
+
+	@Override
+	public String getName()
+	{
+		return mName;
+	}
+
+	@Override
+	public User getSimpleUserObject()
+	{
+		return mUserObject;
+	}
+
+	@Override
+	public List<MenuItem> getAvailableMenuItems()
+	{
+		return mMenuItems;
+	}
+
+	public List<CustomRole> getRoles()
+	{
+		return mRoles;
+	}
+
+	@Override
+	public boolean hasRole(String pmRole)
+	{
+		return true;
+	}
+
+}

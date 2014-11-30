@@ -1,0 +1,25 @@
+#################
+## Eclipse
+#################
+
+.metadata
+bin/
+build/
+tmp/
+*.tmp
+*.bak
+.settings/
+.loadpath
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# PDT-specific
+.buildpath
+

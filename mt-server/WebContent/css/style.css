@@ -1,0 +1,196 @@
+html, body {
+	height: 98%;
+}
+
+body {
+	font-family: Arial;
+}
+
+.container {
+	height: 100%;
+	min-height: 100%;
+	margin: 0 auto;
+	width: 960px;
+	border-top-left-radius: 40px;
+	border-top-right-radius: 40px;
+	box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.33)
+}
+
+.header {
+	height: 100px;
+	border-bottom: 2px solid #a4b0cb;
+}
+
+.header-left {
+	float: left;
+}
+
+.header-right {
+	float: right;
+	background-image: url("../img/logout-64.png");
+	margin: 20px;
+	width: 64px;
+	height: 64px;
+}
+
+.header-right:hover {
+	box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.33)
+}
+
+.content {
+	margin-bottom: 31px;
+}
+
+.innerPage {
+	margin-left: 50px;
+	margin-right: 50px;
+}
+
+.footer {
+	height: 30px;
+	width: 960px;
+	bottom:  0;
+	position: absolute;
+	text-align: center;
+}
+
+.footer span {
+	font-size: 0.5em;
+}
+
+.menuList {
+	background: -moz-linear-gradient(
+       top,
+       #b9c5dd 0%,
+       #a4b0cb);
+  	background: -webkit-gradient(
+       linear, left top, left bottom, 
+       from(#b9c5dd),
+       to(#a4b0cb));
+}
+
+.menuList ul {
+	padding-left:100px;
+	margin: 0;
+	height: 30px;
+	list-style-type: none;
+}
+
+.menuList li {
+	float: left;
+}
+
+.menuList a {
+	text-decoration: none;
+	text-align: center;
+	color: #fff;
+	width:150px;
+	display: block;
+	padding: 5px;
+	border-left: 1px solid #fff;
+}
+
+.menuList li:last-child a {
+	border-right: 1px solid #fff;
+}
+
+.menuList a:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.listTab {
+	border-collapse: collapse;
+	border: 1px solid #666666;
+	background: #f6f6f6;
+}
+
+.listTab .listHeader {
+	font-weight: bold;
+	background: -moz-linear-gradient(
+       top,
+       #f6f6f6 0%,
+       #e1e1e1);
+  	background: -webkit-gradient(
+       linear, left top, left bottom, 
+       from(#f6f6f6),
+       to(#e1e1e1));
+}
+
+.listTab .formRow:nth-child(odd) {
+	background: #e1e1e1;
+}
+
+.readButton {
+	background: url("../img/zoom-32.png");
+	width: 32px;
+	height: 32px;
+	font-size: 0px;
+}
+
+.editButton {
+	background: url("../img/edit-32.png");
+	width: 32px;
+	height: 32px;
+	font-size: 0px;
+}
+
+fieldset {
+	margin-top: 20px;
+}
+
+.topButtons {
+	margin-top: 5px;
+	margin-bottom: 15px;
+	display: block;
+}
+
+.textButton {
+    color: #fff;
+    font-size: 0.9em;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-align: center;
+    text-decoration: none;
+    background: -moz-linear-gradient(
+        top,
+        #b9c5dd 0%,
+        #a4b0cb);
+    background: -webkit-gradient(
+        linear, left top, left bottom, 
+        from(#b9c5dd),
+        to(#a4b0cb));
+    border-radius: 5px;
+    border: 1px solid #737b8d;
+    box-shadow:
+        0px 5px 5px rgba(000,000,000,0.1),
+        inset 0px 1px 0px rgba(255,255,255,0.5);
+    text-shadow:
+        0px 1px 3px rgba(000,000,000,0.3),
+        0px 0px 0px rgba(255,255,255,0);
+    position: static;
+    clear: both;
+}
+
+.formTable {
+	display: table;
+	font-size: 0.8em;
+	margin-top: 15px;
+}
+
+.formRow {
+	display: table-row;
+}
+
+.formCell {
+	display: table-cell;
+	padding: 5px;
+	vertical-align: middle;
+}
+
+.formLabel {
+	width: 120px;
+}
+
+.formHeader {
+	font-weight: bold;
+}
