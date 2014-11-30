@@ -18,7 +18,8 @@
 	</c:if>
 	<input type="submit" name="action" value="${CANCEL}" class="textButton">
 </span>
-<input type="hidden" name="driver_id" value="${not empty TaxiDriver ? TaxiDriver.id : '' }" ${READ eq operation ? 'disabled' : ''}/>
+<input type="hidden" name="driver_id" value="${not empty TaxiDriver ? TaxiDriver.id : '' }" />
+<input type="hidden" name="user_id" value="${not empty TaxiDriver ? TaxiDriver.user.id }" />
 <input type="hidden" name="operation" value="${operation}"/>
 <div class="formTable">
 	<div class="formRow">

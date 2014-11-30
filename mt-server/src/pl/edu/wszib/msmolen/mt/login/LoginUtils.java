@@ -71,12 +71,33 @@ public class LoginUtils
 	public static User registerUser(String pmUserName, String pmPassword) throws ApplicationException
 	{
 		Connection lvConn = null;
+		try
+		{
+			lvConn = DbUtils.getConnection();
+			return registerUser(lvConn, pmUserName, pmPassword);
+		}
+		catch (ApplicationException e)
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new ApplicationException("Błąd rejestracji", "Wystąpił nieoczekiwany błąd podczas rejestracji użytkownika: " + e.getMessage());
+		}
+		finally
+		{
+			DbUtils.close(lvConn);
+		}
+	}
+
+	public static User registerUser(Connection pmConnection, String pmUserName, String pmPassword) throws ApplicationException
+	{
 		PreparedStatement lvStmt = null;
 		ResultSet lvResult = null;
 		try
 		{
-			lvConn = DbUtils.getConnection();
-			lvStmt = lvConn.prepareStatement("INSERT INTO MT_UZYTKOWNICY (ID, NAZWA_UZYTKOWNIKA, HASLO) "
+			lvStmt = pmConnection.prepareStatement("INSERT INTO MT_UZYTKOWNICY (ID, NAZWA_UZYTKOWNIKA, HASLO) "
 					+ "(SELECT NEXTVAL('MT_UZYTKOWNICY_SEQ'), ?, ? "
 					+ "WHERE (SELECT COUNT(*) FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?) = 0) RETURNING ID");
 			lvStmt.setString(1, pmUserName);
@@ -105,7 +126,7 @@ public class LoginUtils
 		}
 		finally
 		{
-			DbUtils.close(lvResult, lvStmt, lvConn);
+			DbUtils.close(lvResult, lvStmt);
 		}
 	}
 }

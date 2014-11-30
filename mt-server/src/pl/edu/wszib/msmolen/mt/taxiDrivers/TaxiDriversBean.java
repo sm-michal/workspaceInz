@@ -1,14 +1,17 @@
 package pl.edu.wszib.msmolen.mt.taxiDrivers;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.utils.EncryptUtils;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 import pl.edu.wszib.msmolen.mt.display.Column;
+import pl.edu.wszib.msmolen.mt.login.LoginUtils;
 
 /**
  * Klasa dostepu do danych taksowkarzy
@@ -65,6 +68,81 @@ public class TaxiDriversBean
 		finally
 		{
 			DbUtils.close(lvResult, lvStmt, lvConn);
+		}
+	}
+
+	/**
+	 * Aktualizuje rekord taksowkarza oraz dane uzytkownika
+	 * 
+	 * @param pmDriver
+	 */
+	public void update(TaxiDriver pmDriver)
+	{
+		Connection lvConn = null;
+		PreparedStatement lvTaxiStmt = null;
+		PreparedStatement lvUserStmt = null;
+		try
+		{
+			lvConn = DbUtils.getConnection();
+			lvConn.setAutoCommit(false);
+
+			lvTaxiStmt = lvConn.prepareStatement("UPDATE MT_TAKSOWKARZE SET IMIE = ?, NAZWISKO = ? WHERE ID = ?");
+			lvTaxiStmt.setString(1, pmDriver.getName());
+			lvTaxiStmt.setString(2, pmDriver.getSurname());
+			lvTaxiStmt.setInt(3, pmDriver.getId());
+			lvTaxiStmt.executeUpdate();
+
+			lvUserStmt = lvConn.prepareStatement("UPDATE MT_UZYTKOWNICY SET LOGIN = ?, PASSWORD = ? WHERE ID = ?");
+			lvUserStmt.setString(1, pmDriver.getUser().getName());
+			lvUserStmt.setString(2, EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
+			lvUserStmt.setInt(3, pmDriver.getUser().getId());
+			lvUserStmt.executeUpdate();
+
+			lvConn.commit();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			DbUtils.rollback(lvConn);
+		}
+		finally
+		{
+			DbUtils.close(lvUserStmt, lvTaxiStmt, lvConn);
+		}
+	}
+
+	/**
+	 * Tworzy nowy rekord taksowkarza
+	 * 
+	 * @param pmDriver
+	 */
+	public void create(TaxiDriver pmDriver)
+	{
+		Connection lvConn = null;
+		PreparedStatement lvStmt = null;
+		try
+		{
+			lvConn = DbUtils.getConnection();
+			lvConn.setAutoCommit(false);
+
+			User lvUser = LoginUtils.registerUser(lvConn, pmDriver.getUser().getName(), EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
+
+			lvStmt = lvConn.prepareStatement("INSERT INTO MT_TAKSOWKARZE (ID, IMIE, NAZWISKO, UZYTKOWNIK_ID) VALUES (MT_TAKSOWKARZE_SEQ, ?, ?, ?)");
+			lvStmt.setString(1, pmDriver.getName());
+			lvStmt.setString(2, pmDriver.getSurname());
+			lvStmt.setInt(3, lvUser.getId());
+			lvStmt.executeUpdate();
+
+			lvConn.commit();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			DbUtils.rollback(lvConn);
+		}
+		finally
+		{
+			DbUtils.close(lvStmt, lvConn);
 		}
 	}
 
