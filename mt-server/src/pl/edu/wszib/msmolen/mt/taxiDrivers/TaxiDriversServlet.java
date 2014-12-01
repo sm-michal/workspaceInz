@@ -1,6 +1,7 @@
 package pl.edu.wszib.msmolen.mt.taxiDrivers;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,24 +22,37 @@ public class TaxiDriversServlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		TaxiDriversBean lvBean = getBeanFromSession(request);
+		try
+		{
+			TaxiDriversBean lvBean = getBeanFromSession(request);
 
-		lvBean.load();
+			lvBean.load();
 
-		request.getSession().setAttribute(TaxiDriversBean.class.getSimpleName(), lvBean);
-
+			request.getSession().setAttribute(TaxiDriversBean.class.getSimpleName(), lvBean);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			request.setAttribute(Exception.class.getSimpleName(), Arrays.asList(e.getMessage()));
+		}
 		redirectToList(request, response);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		TaxiDriversBean lvBean = getBeanFromSession(request);
+		TaxiDriver lvSelected;
+
 		switch (TaxiDriverOperation.getByText(request.getParameter("action")))
 		{
+		case FIRE:
+			lvSelected = lvBean.getById(Integer.parseInt(request.getParameter("driver_id")));
+
+			break;
 		case READ:
 		case MODIFY:
-			TaxiDriversBean lvBean = getBeanFromSession(request);
-			TaxiDriver lvSelected = lvBean.getById(Integer.parseInt(request.getParameter("driver_id")));
+			lvSelected = lvBean.getById(Integer.parseInt(request.getParameter("driver_id")));
 			request.setAttribute(TaxiDriver.class.getSimpleName(), lvSelected);
 		case EMPLOY:
 			request.setAttribute("operation", request.getParameter("action"));

@@ -1,6 +1,9 @@
 package pl.edu.wszib.msmolen.mt.taxiDrivers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -29,10 +32,15 @@ public class SaveDriverServlet extends HttpServlet
 		case SAVE:
 			if (lvOperation != TaxiDriverOperation.READ)
 			{
-				validate(request, lvOperation);
-				if (!save(request, lvOperation))
+				if (!validate(request, lvOperation) || !save(request, lvOperation))
 				{
+					refreshFormData(request);
+					request.setAttribute(TaxiDriverOperation.class.getSimpleName(), lvOperation);
 					request.setAttribute("includePage", "jsp/taxiDrivers/taxiDriversForm.jsp");
+				}
+				else
+				{
+					request.setAttribute("includePage", "jsp/taxiDrivers/taxiDriversList.jsp");
 				}
 			}
 			break;
@@ -45,47 +53,104 @@ public class SaveDriverServlet extends HttpServlet
 		lvDispatcher.forward(request, response);
 	}
 
-	private void validate(HttpServletRequest pmRequest, TaxiDriverOperation pmOperation)
+	/**
+	 * 
+	 * @param pmRequest
+	 * @param pmOperation
+	 * @return
+	 */
+	private boolean validate(HttpServletRequest pmRequest, TaxiDriverOperation pmOperation)
 	{
-		if (pmOperation == TaxiDriverOperation.READ)
-			return;
-
-		String lvPassword = pmRequest.getParameter("password");
-		String lvRPassword = pmRequest.getParameter("repeatPassword");
-		if (!lvPassword.equals(lvRPassword))
-		{
-
-		}
+		List<String> lvErrors = new ArrayList<String>();
 
 		String lvName = pmRequest.getParameter("name");
 		if (lvName == null || "".equals(lvName.trim()))
 		{
-
+			lvErrors.add("Imię nie może być puste.");
 		}
 
 		String lvSurname = pmRequest.getParameter("surname");
 		if (lvSurname == null || "".equals(lvSurname.trim()))
 		{
-
+			lvErrors.add("Nazwisko nie może być puste.");
 		}
 
 		String lvLogin = pmRequest.getParameter("login");
 		if (lvLogin == null || "".equals(lvLogin.trim()))
 		{
+			lvErrors.add("Login nie może być pusty.");
+		}
 
+		String lvPassword = pmRequest.getParameter("password");
+		String lvRPassword = pmRequest.getParameter("repeatPassword");
+		if (!lvPassword.equals(lvRPassword))
+		{
+			lvErrors.add("Hasło i powtórzenie hasła muszą być zgodne.");
+		}
+		else if (pmOperation == TaxiDriverOperation.EMPLOY && "".equals(lvPassword.trim()))
+		{
+			lvErrors.add("Hasło nie może być puste.");
+		}
+
+		if (!lvErrors.isEmpty())
+		{
+			pmRequest.setAttribute(Exception.class.getSimpleName(), lvErrors);
+			return false;
+		}
+		else
+			return true;
+	}
+
+	/**
+	 * 
+	 * @param pmRequest
+	 * @param pmOperation
+	 * @return
+	 */
+	private boolean save(HttpServletRequest pmRequest, TaxiDriverOperation pmOperation)
+	{
+		try
+		{
+			TaxiDriversBean lvBean = (TaxiDriversBean) pmRequest.getSession().getAttribute(TaxiDriversBean.class.getSimpleName());
+
+			String lvIdStr = pmRequest.getParameter("driver_id");
+			String lvName = pmRequest.getParameter("name");
+			String lvSurname = pmRequest.getParameter("surname");
+			String lvUserIdStr = pmRequest.getParameter("user_id");
+			String lvLogin = pmRequest.getParameter("login");
+			String lvPassword = pmRequest.getParameter("password");
+			int lvId = -1;
+			int lvUserId = -1;
+			if (lvIdStr != null && !"".equals(lvIdStr))
+				lvId = Integer.parseInt(lvIdStr);
+			if (lvUserIdStr != null && !"".equals(lvUserIdStr))
+				lvUserId = Integer.parseInt(lvUserIdStr);
+
+			TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray()));
+
+			if (pmOperation == TaxiDriverOperation.EMPLOY)
+				lvBean.create(lvDriver);
+			else if (pmOperation == TaxiDriverOperation.MODIFY)
+				lvBean.update(lvDriver);
+
+			lvBean.load();
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			pmRequest.setAttribute(Exception.class.getSimpleName(), Arrays.asList(e.getMessage()));
+			return false;
 		}
 	}
 
-	private boolean save(HttpServletRequest pmRequest, TaxiDriverOperation pmOperation)
+	private void refreshFormData(HttpServletRequest pmRequest)
 	{
-		TaxiDriversBean lvBean = (TaxiDriversBean) pmRequest.getSession().getAttribute(TaxiDriversBean.class.getSimpleName());
-
 		String lvIdStr = pmRequest.getParameter("driver_id");
 		String lvName = pmRequest.getParameter("name");
 		String lvSurname = pmRequest.getParameter("surname");
 		String lvUserIdStr = pmRequest.getParameter("user_id");
 		String lvLogin = pmRequest.getParameter("login");
-		String lvPassword = pmRequest.getParameter("password");
 		int lvId = -1;
 		int lvUserId = -1;
 		if (lvIdStr != null && !"".equals(lvIdStr))
@@ -93,14 +158,8 @@ public class SaveDriverServlet extends HttpServlet
 		if (lvUserIdStr != null && !"".equals(lvUserIdStr))
 			lvUserId = Integer.parseInt(lvUserIdStr);
 
-		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray()));
-
-		if (pmOperation == TaxiDriverOperation.EMPLOY)
-			lvBean.create(lvDriver);
-		else if (pmOperation == TaxiDriverOperation.MODIFY)
-			lvBean.update(lvDriver);
-
-		return true;
+		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, new char[0]));
+		pmRequest.setAttribute(TaxiDriver.class.getSimpleName(), lvDriver);
 	}
 
 }

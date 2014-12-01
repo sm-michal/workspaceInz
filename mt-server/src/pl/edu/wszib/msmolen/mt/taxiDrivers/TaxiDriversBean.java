@@ -9,6 +9,7 @@ import java.util.List;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
 import pl.edu.wszib.msmolen.mt.common.utils.EncryptUtils;
+import pl.edu.wszib.msmolen.mt.common.utils.exceptions.ApplicationException;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 import pl.edu.wszib.msmolen.mt.display.Column;
 import pl.edu.wszib.msmolen.mt.login.LoginUtils;
@@ -36,7 +37,7 @@ public class TaxiDriversBean
 	/**
 	 * Pobiera dane taksowkarzy z bazy
 	 */
-	public void load()
+	public void load() throws Exception
 	{
 		data = new ArrayList<TaxiDriver>();
 
@@ -48,7 +49,7 @@ public class TaxiDriversBean
 			lvConn = DbUtils.getConnection();
 			lvStmt = lvConn.createStatement();
 			lvResult = lvStmt.executeQuery("SELECT T.ID, T.IMIE, T.NAZWISKO, T.UZYTKOWNIK_ID, U.NAZWA_UZYTKOWNIKA, U.HASLO "
-					+ "FROM MT_TAKSOWKARZE T JOIN MT_UZYTKOWNICY U ON U.ID = T.UZYTKOWNIK_ID");
+					+ "FROM MT_TAKSOWKARZE T JOIN MT_UZYTKOWNICY U ON U.ID = T.UZYTKOWNIK_ID ORDER BY ID");
 			while (lvResult.next())
 			{
 				data.add(new TaxiDriver(
@@ -64,6 +65,7 @@ public class TaxiDriversBean
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			throw new Exception("Wystąpił nieoczekiwany błąd podczas ładowania listy.");
 		}
 		finally
 		{
@@ -76,7 +78,7 @@ public class TaxiDriversBean
 	 * 
 	 * @param pmDriver
 	 */
-	public void update(TaxiDriver pmDriver)
+	public void update(TaxiDriver pmDriver) throws Exception
 	{
 		Connection lvConn = null;
 		PreparedStatement lvTaxiStmt = null;
@@ -92,18 +94,36 @@ public class TaxiDriversBean
 			lvTaxiStmt.setInt(3, pmDriver.getId());
 			lvTaxiStmt.executeUpdate();
 
-			lvUserStmt = lvConn.prepareStatement("UPDATE MT_UZYTKOWNICY SET LOGIN = ?, PASSWORD = ? WHERE ID = ?");
+			lvUserStmt = lvConn.prepareStatement("UPDATE MT_UZYTKOWNICY SET NAZWA_UZYTKOWNIKA = ?" + (pmDriver.getUser().getPassword() != null ? ", HASLO = ?" : "") +
+					" WHERE ID = ? AND NOT EXISTS (SELECT 1 FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?)");
 			lvUserStmt.setString(1, pmDriver.getUser().getName());
-			lvUserStmt.setString(2, EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
-			lvUserStmt.setInt(3, pmDriver.getUser().getId());
-			lvUserStmt.executeUpdate();
+			if (pmDriver.getUser().getPassword() != null)
+			{
+				lvUserStmt.setString(2, EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
+				lvUserStmt.setInt(3, pmDriver.getUser().getId());
+				lvUserStmt.setString(4, pmDriver.getUser().getName());
+			}
+			else
+			{
+				lvUserStmt.setInt(2, pmDriver.getUser().getId());
+				lvUserStmt.setString(3, pmDriver.getUser().getName());
+			}
+			if (lvUserStmt.executeUpdate() == 0)
+				throw new ApplicationException("", "Istnieje już użytkownik o takim samym loginie. Należy podać inny login.");
 
 			lvConn.commit();
+		}
+		catch (ApplicationException e)
+		{
+			e.printStackTrace();
+			DbUtils.rollback(lvConn);
+			throw e;
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			DbUtils.rollback(lvConn);
+			throw new Exception("Nie udało się zapisać danych taksówkarza.");
 		}
 		finally
 		{
@@ -116,7 +136,7 @@ public class TaxiDriversBean
 	 * 
 	 * @param pmDriver
 	 */
-	public void create(TaxiDriver pmDriver)
+	public void create(TaxiDriver pmDriver) throws Exception
 	{
 		Connection lvConn = null;
 		PreparedStatement lvStmt = null;
@@ -127,7 +147,7 @@ public class TaxiDriversBean
 
 			User lvUser = LoginUtils.registerUser(lvConn, pmDriver.getUser().getName(), EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
 
-			lvStmt = lvConn.prepareStatement("INSERT INTO MT_TAKSOWKARZE (ID, IMIE, NAZWISKO, UZYTKOWNIK_ID) VALUES (MT_TAKSOWKARZE_SEQ, ?, ?, ?)");
+			lvStmt = lvConn.prepareStatement("INSERT INTO MT_TAKSOWKARZE (ID, IMIE, NAZWISKO, UZYTKOWNIK_ID) VALUES (NEXTVAL('MT_TAKSOWKARZE_SEQ'), ?, ?, ?)");
 			lvStmt.setString(1, pmDriver.getName());
 			lvStmt.setString(2, pmDriver.getSurname());
 			lvStmt.setInt(3, lvUser.getId());
@@ -135,10 +155,17 @@ public class TaxiDriversBean
 
 			lvConn.commit();
 		}
+		catch (ApplicationException e)
+		{
+			e.printStackTrace();
+			DbUtils.rollback(lvConn);
+			throw e;
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			DbUtils.rollback(lvConn);
+			throw new Exception("Nie udało się zapisać danych taksówkarza.");
 		}
 		finally
 		{

@@ -11,7 +11,7 @@
 
 <fieldset>
 <legend>Dane taksówkarza</legend>
-<form action="" method="POST">
+<form action="saveDriver" method="POST">
 <span>
 	<c:if test="${operation ne READ}">
 	<input type="submit" name="action" value="${SAVE}" class="textButton">
@@ -19,7 +19,7 @@
 	<input type="submit" name="action" value="${CANCEL}" class="textButton">
 </span>
 <input type="hidden" name="driver_id" value="${not empty TaxiDriver ? TaxiDriver.id : '' }" />
-<input type="hidden" name="user_id" value="${not empty TaxiDriver ? TaxiDriver.user.id }" />
+<input type="hidden" name="user_id" value="${not empty TaxiDriver ? TaxiDriver.user.id : ''}" />
 <input type="hidden" name="operation" value="${operation}"/>
 <div class="formTable">
 	<div class="formRow">

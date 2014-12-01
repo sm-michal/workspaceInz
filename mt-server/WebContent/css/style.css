@@ -194,3 +194,27 @@ fieldset {
 .formHeader {
 	font-weight: bold;
 }
+
+.exDiv {
+	font-size: 0.8em;
+	position: absolute;
+	left: 20px;
+	top: 170px;
+	width: 250px;
+}
+
+.singleException {
+	box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.4), 0 4px 20px rgba(0, 0, 0, 0.33);
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.singleException ul {
+	padding-left: 20px;	
+}
+
+.singleException li {
+	padding: 5px;
+}

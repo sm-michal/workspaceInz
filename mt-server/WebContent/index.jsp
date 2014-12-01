@@ -40,5 +40,18 @@
 			<span>&copy; Michał Smoleń 2014</span>
 		</div>
 	</div>
+
+	<c:if test="${not empty Exception}">
+		<div class="exDiv">
+		<c:forEach items="${Exception}" var="ex">
+			<div class="singleException">
+				<ul><li><c:out value="${ex}"></c:out></li></ul>
+			</div>
+		</c:forEach>
+		
+		<c:remove var="Exception"/>
+		</div>
+	</c:if>
+	
 	</body>
 </html>
