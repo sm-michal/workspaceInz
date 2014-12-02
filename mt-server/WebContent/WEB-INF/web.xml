@@ -4,6 +4,7 @@
     <web-resource-collection>
       <web-resource-name></web-resource-name>
       <url-pattern>/exchange/*</url-pattern>
+      <url-pattern>/applet/*</url-pattern>
       <http-method>GET</http-method>
       <http-method>POST</http-method>
     </web-resource-collection>

@@ -1,0 +1,3 @@
+Permissions: sandbox
+Codebase: localhost
+Application-Name: Mobil-Taxi
