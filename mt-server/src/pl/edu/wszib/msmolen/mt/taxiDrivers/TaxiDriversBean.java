@@ -97,18 +97,20 @@ public class TaxiDriversBean
 			lvTaxiStmt.executeUpdate();
 
 			lvUserStmt = lvConn.prepareStatement("UPDATE MT_UZYTKOWNICY SET NAZWA_UZYTKOWNIKA = ?" + (pmDriver.getUser().getPassword() != null ? ", HASLO = ?" : "") +
-					" WHERE ID = ? AND NOT EXISTS (SELECT 1 FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?)");
+					" WHERE ID = ? AND NOT EXISTS (SELECT 1 FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ? AND ID <> ?)");
 			lvUserStmt.setString(1, pmDriver.getUser().getName());
 			if (pmDriver.getUser().getPassword() != null)
 			{
 				lvUserStmt.setString(2, EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
 				lvUserStmt.setInt(3, pmDriver.getUser().getId());
 				lvUserStmt.setString(4, pmDriver.getUser().getName());
+				lvUserStmt.setInt(5, pmDriver.getUser().getId());
 			}
 			else
 			{
 				lvUserStmt.setInt(2, pmDriver.getUser().getId());
 				lvUserStmt.setString(3, pmDriver.getUser().getName());
+				lvUserStmt.setInt(4, pmDriver.getUser().getId());
 			}
 			if (lvUserStmt.executeUpdate() == 0)
 				throw new ApplicationException("", "Istnieje już użytkownik o takim samym loginie. Należy podać inny login.");

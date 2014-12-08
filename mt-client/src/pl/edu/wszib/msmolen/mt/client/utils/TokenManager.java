@@ -1,10 +1,12 @@
 package pl.edu.wszib.msmolen.mt.client.utils;
 
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import pl.edu.wszib.msmolen.mt.common.auth.Token;
+import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 
 public class TokenManager
 {
@@ -28,6 +30,7 @@ public class TokenManager
 
 	public void obtainToken() throws Exception
 	{
+		ObjectOutputStream lvOOS = null;
 		ObjectInputStream lvOIS = null;
 		int lvLicznikProb = 0;
 
@@ -35,10 +38,13 @@ public class TokenManager
 		{
 			try
 			{
-				HttpURLConnection lvConnection = (HttpURLConnection) new URL(SERVLET_PATH + "?operacja=GET").openConnection();
+				HttpURLConnection lvConnection = (HttpURLConnection) new URL(SERVLET_PATH).openConnection();
 				lvConnection.setDoInput(true);
 				lvConnection.setDoOutput(true);
 				lvConnection.setRequestMethod("POST");
+
+				lvOOS = new ObjectOutputStream(lvConnection.getOutputStream());
+				lvOOS.writeObject(Const.OPERACJA_GET_TOKEN);
 
 				lvOIS = new ObjectInputStream(lvConnection.getInputStream());
 				token = (Token) lvOIS.readObject();
@@ -57,6 +63,15 @@ public class TokenManager
 					catch (Exception e)
 					{
 					}
+
+				if (lvOOS != null)
+					try
+					{
+						lvOOS.close();
+					}
+					catch (Exception e)
+					{
+					}
 			}
 			lvLicznikProb++;
 		}
@@ -67,13 +82,19 @@ public class TokenManager
 
 	public void disposeToken()
 	{
+		ObjectOutputStream lvOOS = null;
 		ObjectInputStream lvOIS = null;
 		try
 		{
-			HttpURLConnection lvConnection = (HttpURLConnection) new URL(addTokenToPath(SERVLET_PATH + "?operacja=DISPOSE")).openConnection();
+			HttpURLConnection lvConnection = (HttpURLConnection) new URL(SERVLET_PATH).openConnection();
 			lvConnection.setDoInput(true);
 			lvConnection.setDoOutput(true);
 			lvConnection.setRequestMethod("POST");
+
+			lvOOS = new ObjectOutputStream(lvConnection.getOutputStream());
+			lvOOS.writeObject(Const.OPERACJA_DISPOSE_TOKEN);
+			lvOOS.writeObject(token);
+			lvOOS.writeObject(UserManager.getInstance().getUser());
 
 			lvOIS = new ObjectInputStream(lvConnection.getInputStream());
 		}
@@ -91,25 +112,16 @@ public class TokenManager
 				catch (Exception e)
 				{
 				}
-		}
-	}
 
-	public static String addTokenToPath(String pmPath)
-	{
-		if (pmPath == null || "".equals(pmPath))
-			return pmPath;
-
-		StringBuilder lvPath = new StringBuilder(pmPath);
-		if (!pmPath.contains("?"))
-		{
-			lvPath.append("?");
+			if (lvOOS != null)
+				try
+				{
+					lvOOS.close();
+				}
+				catch (Exception e)
+				{
+				}
 		}
-		else if (!pmPath.contains("&"))
-		{
-			lvPath.append("&");
-		}
-
-		return lvPath.append("TOKEN=").append(getInstance().token.getTokenValue()).toString();
 	}
 
 	public Token getToken()

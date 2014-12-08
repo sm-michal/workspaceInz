@@ -36,13 +36,19 @@ public class LoginUtils
 		{
 			lvConn = DbUtils.getConnection();
 			lvStmt = lvConn.prepareStatement("SELECT U.ID, U.NAZWA_UZYTKOWNIKA, U.HASLO, T.ID FROM MT_UZYTKOWNICY U "
-					+ "LEFT JOIN MT_TAKSOWKARZE T ON T.UZYTKOWNIK_ID = U.ID"
+					+ "LEFT JOIN MT_TAKSOWKARZE T ON T.UZYTKOWNIK_ID = U.ID "
 					+ "WHERE U.NAZWA_UZYTKOWNIKA = ? AND U.HASLO = ?");
 			lvStmt.setString(1, pmUserName);
 			lvStmt.setString(2, pmPassword);
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
+			{
+				if (lvResult.getString(4) != null)
+				{
+					logDriverLogin(lvConn, lvResult.getInt(4));
+				}
 				return new User(lvResult.getInt(1), lvResult.getString(2), lvResult.getString(3).toCharArray(), lvResult.getString(4) != null ? UserType.DRIVER : UserType.CLIENT);
+			}
 			else
 				throw new ApplicationException("Błąd logowania", "Logowanie nie powiodło się. Podano nieprawidłowy login lub hasło.");
 		}
@@ -53,11 +59,61 @@ public class LoginUtils
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			throw new ApplicationException("Błąd logowania", "Wystąpił nieoczekiwany błąd podczas rejestracji użytkownika: " + e.getMessage());
+			throw new ApplicationException("Błąd logowania", "Wystąpił nieoczekiwany błąd podczas logowania użytkownika: " + e.getMessage());
 		}
 		finally
 		{
 			DbUtils.close(lvResult, lvStmt, lvConn);
+		}
+	}
+
+	/**
+	 * Zapisuje zalogowanie sie taksowkarza.
+	 * 
+	 * @param pmConnection
+	 * @param pmDriverId
+	 * @throws Exception
+	 */
+	public static void logDriverLogin(Connection pmConnection, int pmDriverId) throws Exception
+	{
+		PreparedStatement lvStmt = null;
+		try
+		{
+			lvStmt = pmConnection.prepareStatement("UPDATE MT_TAKSOWKARZE SET CZY_AKTYWNY = ? WHERE ID = ?");
+			lvStmt.setBoolean(1, true);
+			lvStmt.setInt(2, pmDriverId);
+			lvStmt.executeUpdate();
+		}
+		finally
+		{
+			DbUtils.close(lvStmt);
+		}
+	}
+
+	/**
+	 * Zapisuje wylogowanie sie taksowkarza.
+	 * 
+	 * @param pmDriverId
+	 * @throws Exception
+	 */
+	public static void logDriverLogout(User pmDriver) throws Exception
+	{
+		if (pmDriver == null)
+			return;
+
+		Connection lvConn = null;
+		PreparedStatement lvStmt = null;
+		try
+		{
+			lvConn = DbUtils.getConnection();
+			lvStmt = lvConn.prepareStatement("UPDATE MT_TAKSOWKARZE SET CZY_AKTYWNY = ? WHERE UZYTKOWNIK_ID = ?");
+			lvStmt.setBoolean(1, false);
+			lvStmt.setInt(2, pmDriver.getId());
+			lvStmt.executeUpdate();
+		}
+		finally
+		{
+			DbUtils.close(lvStmt, lvConn);
 		}
 	}
 

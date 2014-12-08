@@ -1,6 +1,7 @@
 package pl.edu.wszib.msmolen.mt.exchange;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,8 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import pl.edu.wszib.msmolen.mt.common.auth.Token;
+import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 import pl.edu.wszib.msmolen.mt.common.utils.EncryptUtils;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
+import pl.edu.wszib.msmolen.mt.login.LoginUtils;
 
 /**
  * Servlet przydzielajacy identyfikatory poszczegolnym klientom i zapisujacy je
@@ -26,25 +30,27 @@ public class TokenServlet extends HttpServlet
 
 	private static final long serialVersionUID = 876221085444631091L;
 
-	private static final String OPERACJA_PARAM = "operacja";
-	private static final String OPERACJA_GET = "GET";
-	private static final String OPERACJA_DISPOSE = "DISPOSE";
-
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		String lvOperacja = request.getParameter(OPERACJA_PARAM);
+		ObjectInputStream lvOIS = null;
 		ObjectOutputStream lvOOS = null;
 		try
 		{
+			lvOIS = new ObjectInputStream(request.getInputStream());
+
+			String lvOperacja = (String) lvOIS.readObject();
+
 			lvOOS = new ObjectOutputStream(response.getOutputStream());
-			if (OPERACJA_GET.equals(lvOperacja))
+			if (Const.OPERACJA_GET_TOKEN.equals(lvOperacja))
 			{
 				lvOOS.writeObject(getNextToken());
 			}
-			else if (OPERACJA_DISPOSE.equals(lvOperacja))
+			else if (Const.OPERACJA_DISPOSE_TOKEN.equals(lvOperacja))
 			{
-				disposeToken(request.getParameter("TOKEN"));
+				disposeToken((Token) lvOIS.readObject());
+				LoginUtils.logDriverLogout((User) lvOIS.readObject());
+
 				lvOOS.writeObject("OK");
 			}
 			lvOOS.flush();
@@ -109,7 +115,7 @@ public class TokenServlet extends HttpServlet
 		return null;
 	}
 
-	private void disposeToken(String pmTokenValue)
+	private void disposeToken(Token pmToken)
 	{
 		Connection lvConn = null;
 		PreparedStatement lvStmt = null;
@@ -117,7 +123,7 @@ public class TokenServlet extends HttpServlet
 		{
 			lvConn = DbUtils.getConnection();
 			lvStmt = lvConn.prepareStatement("DELETE FROM MT_AKTUALNE_TOKENY WHERE TOKEN = ?");
-			lvStmt.setString(1, pmTokenValue);
+			lvStmt.setString(1, pmToken.getTokenValue());
 			lvStmt.executeUpdate();
 		}
 		catch (Exception e)
