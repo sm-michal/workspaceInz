@@ -9,12 +9,14 @@ public class User implements Serializable
 	private final int id;
 	private final String name;
 	private final char[] password;
+	private final UserType userType;
 
-	public User(int pmId, String pmName, char[] pmPassword)
+	public User(int pmId, String pmName, char[] pmPassword, UserType pmUserType)
 	{
 		id = pmId;
 		name = pmName;
 		password = pmPassword;
+		userType = pmUserType;
 	}
 
 	public int getId()
@@ -30,5 +32,10 @@ public class User implements Serializable
 	public char[] getPassword()
 	{
 		return password;
+	}
+
+	public UserType getUserType()
+	{
+		return userType;
 	}
 }

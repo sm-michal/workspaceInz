@@ -218,3 +218,9 @@ fieldset {
 .singleException li {
 	padding: 5px;
 }
+
+#googleMapDiv {
+	border: 1px solid black;
+	width: 100%;
+	height: 400px;
+}

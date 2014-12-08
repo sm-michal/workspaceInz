@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 import pl.edu.wszib.msmolen.mt.display.MenuItem;
 
@@ -83,7 +84,9 @@ public class UserLoginDAO
 		ResultSet lvResultMenu = null;
 		try
 		{
-			lvStmt = getConnection().prepareStatement("SELECT ID, HASLO FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?");
+			lvStmt = getConnection().prepareStatement("SELECT U.ID, U.HASLO, T.ID FROM MT_UZYTKOWNICY U "
+					+ "LEFT JOIN MT_TAKSOWKARZE T ON T.UZYTKOWNIK_ID = U.ID "
+					+ "WHERE U.NAZWA_UZYTKOWNIKA = ?");
 			lvStmt.setString(1, pmUserName);
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
@@ -115,7 +118,8 @@ public class UserLoginDAO
 					lvMenus.add(new MenuItem(lvResultMenu.getInt(1), lvResultMenu.getString(2), lvResultMenu.getString(3)));
 				}
 
-				return new CustomUser(lvId, pmUserName, lvPassword, lvMenus, lvRoles);
+				return new CustomUser(lvId, pmUserName, lvPassword, lvMenus, lvRoles,
+						!lvRoles.isEmpty() ? UserType.ADMIN : lvResult.getString(3) != null ? UserType.DRIVER : UserType.CLIENT);
 			}
 		}
 		catch (Exception e)

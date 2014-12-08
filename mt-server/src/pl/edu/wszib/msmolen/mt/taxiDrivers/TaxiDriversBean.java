@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 import pl.edu.wszib.msmolen.mt.common.utils.EncryptUtils;
 import pl.edu.wszib.msmolen.mt.common.utils.exceptions.ApplicationException;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
@@ -59,7 +60,8 @@ public class TaxiDriversBean
 						new User(
 								lvResult.getInt(4),
 								lvResult.getString(5),
-								lvResult.getString(6).toCharArray())));
+								lvResult.getString(6).toCharArray(),
+								UserType.DRIVER)));
 			}
 		}
 		catch (Exception e)

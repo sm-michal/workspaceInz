@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 import pl.edu.wszib.msmolen.mt.common.utils.exceptions.ApplicationException;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 
@@ -34,12 +35,14 @@ public class LoginUtils
 		try
 		{
 			lvConn = DbUtils.getConnection();
-			lvStmt = lvConn.prepareStatement("SELECT ID, NAZWA_UZYTKOWNIKA, HASLO FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ? AND HASLO = ?");
+			lvStmt = lvConn.prepareStatement("SELECT U.ID, U.NAZWA_UZYTKOWNIKA, U.HASLO, T.ID FROM MT_UZYTKOWNICY U "
+					+ "LEFT JOIN MT_TAKSOWKARZE T ON T.UZYTKOWNIK_ID = U.ID"
+					+ "WHERE U.NAZWA_UZYTKOWNIKA = ? AND U.HASLO = ?");
 			lvStmt.setString(1, pmUserName);
 			lvStmt.setString(2, pmPassword);
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
-				return new User(lvResult.getInt(1), lvResult.getString(2), lvResult.getString(3).toCharArray());
+				return new User(lvResult.getInt(1), lvResult.getString(2), lvResult.getString(3).toCharArray(), lvResult.getString(4) != null ? UserType.DRIVER : UserType.CLIENT);
 			else
 				throw new ApplicationException("Błąd logowania", "Logowanie nie powiodło się. Podano nieprawidłowy login lub hasło.");
 		}
@@ -106,7 +109,7 @@ public class LoginUtils
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
 			{
-				return new User(lvResult.getInt(1), pmUserName, pmPassword.toCharArray());
+				return new User(lvResult.getInt(1), pmUserName, pmPassword.toCharArray(), UserType.CLIENT);
 			}
 			else
 			{

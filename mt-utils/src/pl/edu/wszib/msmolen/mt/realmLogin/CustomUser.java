@@ -3,6 +3,7 @@ package pl.edu.wszib.msmolen.mt.realmLogin;
 import java.util.List;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 import pl.edu.wszib.msmolen.mt.display.MenuItem;
 
 public class CustomUser implements CustomPrincipal
@@ -12,10 +13,10 @@ public class CustomUser implements CustomPrincipal
 	private final List<MenuItem> mMenuItems;
 	private final List<CustomRole> mRoles;
 
-	protected CustomUser(int pmId, String pmName, String pmPassword, List<MenuItem> pmMenuItems, List<CustomRole> pmRoles)
+	protected CustomUser(int pmId, String pmName, String pmPassword, List<MenuItem> pmMenuItems, List<CustomRole> pmRoles, UserType pmUserType)
 	{
 		mName = pmName;
-		mUserObject = new User(pmId, pmName, pmPassword.toCharArray());
+		mUserObject = new User(pmId, pmName, pmPassword.toCharArray(), pmUserType);
 		mMenuItems = pmMenuItems;
 		mRoles = pmRoles;
 	}
@@ -38,6 +39,7 @@ public class CustomUser implements CustomPrincipal
 		return mMenuItems;
 	}
 
+	@Override
 	public List<CustomRole> getRoles()
 	{
 		return mRoles;

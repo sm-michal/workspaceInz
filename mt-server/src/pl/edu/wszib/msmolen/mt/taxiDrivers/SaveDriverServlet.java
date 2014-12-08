@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 
 /**
  * Servlet implementation class SaveDriverServlet
@@ -126,7 +127,7 @@ public class SaveDriverServlet extends HttpServlet
 			if (lvUserIdStr != null && !"".equals(lvUserIdStr))
 				lvUserId = Integer.parseInt(lvUserIdStr);
 
-			TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray()));
+			TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray(), UserType.DRIVER));
 
 			if (pmOperation == TaxiDriverOperation.EMPLOY)
 				lvBean.create(lvDriver);
@@ -158,7 +159,7 @@ public class SaveDriverServlet extends HttpServlet
 		if (lvUserIdStr != null && !"".equals(lvUserIdStr))
 			lvUserId = Integer.parseInt(lvUserIdStr);
 
-		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, new char[0]));
+		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, new char[0], UserType.DRIVER));
 		pmRequest.setAttribute(TaxiDriver.class.getSimpleName(), lvDriver);
 	}
 
