@@ -21,19 +21,25 @@ import pl.edu.wszib.msmolen.mt.common.exchange.Const;
  * Servlet implementation class BasicExchangeServlet
  */
 @WebServlet("/exchange/exchangeData")
-public class BasicExchangeServlet extends HttpServlet
+public abstract class BasicExchangeServlet extends HttpServlet
 {
 
 	private static final long serialVersionUID = -3675941988405666858L;
 
+	/**
+	 * 
+	 */
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	protected final void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		System.out.println("BASIC GET");
 	}
 
+	/**
+	 * 
+	 */
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	protected final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		try
 		{
@@ -46,10 +52,20 @@ public class BasicExchangeServlet extends HttpServlet
 		}
 	}
 
-	protected void processRequest(HttpServletResponse pmResponse, Object[] pmObjects) throws Exception
-	{
-	}
+	/**
+	 * 
+	 * @param pmResponse
+	 * @param pmObjects
+	 * @throws Exception
+	 */
+	abstract protected void processRequest(HttpServletResponse pmResponse, Object[] pmObjects) throws Exception;
 
+	/**
+	 * 
+	 * @param pmRequest
+	 * @return
+	 * @throws Exception
+	 */
 	private Object[] readRequest(HttpServletRequest pmRequest) throws Exception
 	{
 		List<Object> lvObjects = new ArrayList<Object>();
@@ -89,6 +105,11 @@ public class BasicExchangeServlet extends HttpServlet
 		return lvObjects.toArray();
 	}
 
+	/**
+	 * 
+	 * @param pmException
+	 * @param pmResponse
+	 */
 	private void sendErrorToClient(Exception pmException, HttpServletResponse pmResponse)
 	{
 		ObjectOutputStream lvOOS = null;
@@ -123,6 +144,12 @@ public class BasicExchangeServlet extends HttpServlet
 		}
 	}
 
+	/**
+	 * 
+	 * @param pmRequestObjs
+	 * @return
+	 * @throws Exception
+	 */
 	private boolean checkToken(List<Object> pmRequestObjs) throws Exception
 	{
 		if (pmRequestObjs == null || pmRequestObjs.size() == 0 || !(pmRequestObjs.get(0) instanceof Token))

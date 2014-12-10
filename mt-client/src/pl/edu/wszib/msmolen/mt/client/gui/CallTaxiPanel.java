@@ -13,6 +13,10 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import pl.edu.wszib.msmolen.mt.client.process.LogoutProcess;
+import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
+import pl.edu.wszib.msmolen.mt.common.auth.User;
+
 public class CallTaxiPanel extends JPanel
 {
 
@@ -43,7 +47,7 @@ public class CallTaxiPanel extends JPanel
 
 		listener = new ButtonActionListener(this);
 
-		mBackButton = new JButton("< Wstecz");
+		mBackButton = new JButton(UserManager.getInstance().getUser() != null ? "Wyloguj" : "< Wstecz");
 		mBackButton.setSize(100, 30);
 		mBackButton.setLocation(getWidth() - 100, 0);
 		mBackButton.addActionListener(listener);
@@ -119,7 +123,15 @@ public class CallTaxiPanel extends JPanel
 		public void actionPerformed(ActionEvent evt)
 		{
 			if (mBackButton.equals(evt.getSource()))
+			{
+				User lvUser = UserManager.getInstance().getUser();
+				if (lvUser != null)
+				{
+					new LogoutProcess((StartWindow) mParent.getRootPane().getParent(), UserManager.getInstance().getUser().getName()).process();
+				}
+
 				mParent.moveToBack(mPanel);
+			}
 		}
 	}
 

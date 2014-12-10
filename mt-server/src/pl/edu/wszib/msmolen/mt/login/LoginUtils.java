@@ -93,7 +93,9 @@ public class LoginUtils
 	/**
 	 * Zapisuje wylogowanie sie taksowkarza.
 	 * 
-	 * @param pmDriverId
+	 * @param pmDriver
+	 * 
+	 * 
 	 * @throws Exception
 	 */
 	public static void logDriverLogout(User pmDriver) throws Exception
@@ -101,14 +103,26 @@ public class LoginUtils
 		if (pmDriver == null)
 			return;
 
+		logDriverLogout(pmDriver.getName());
+	}
+
+	/**
+	 * 
+	 * @param pmUserName
+	 * @throws Exception
+	 */
+	public static void logDriverLogout(String pmUserName) throws Exception
+	{
 		Connection lvConn = null;
 		PreparedStatement lvStmt = null;
 		try
 		{
 			lvConn = DbUtils.getConnection();
-			lvStmt = lvConn.prepareStatement("UPDATE MT_TAKSOWKARZE SET CZY_AKTYWNY = ? WHERE UZYTKOWNIK_ID = ?");
+			lvStmt = lvConn.prepareStatement("UPDATE MT_TAKSOWKARZE SET CZY_AKTYWNY = ? WHERE UZYTKOWNIK_ID = ("
+					+ "SELECT ID FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?"
+					+ ")");
 			lvStmt.setBoolean(1, false);
-			lvStmt.setInt(2, pmDriver.getId());
+			lvStmt.setString(2, pmUserName);
 			lvStmt.executeUpdate();
 		}
 		finally

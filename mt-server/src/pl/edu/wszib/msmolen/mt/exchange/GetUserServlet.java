@@ -28,7 +28,11 @@ public class GetUserServlet extends BasicExchangeServlet
 		{
 			String lvMode = (String) pmObjects[0];
 			String lvLogin = (String) pmObjects[1];
-			String lvPassword = (String) pmObjects[2];
+			String lvPassword = null;
+			if (pmObjects.length > 2)
+			{
+				lvPassword = (String) pmObjects[2];
+			}
 
 			User lvUser = null;
 			if (Const.MODE_REGISTER.equals(lvMode))
@@ -38,6 +42,15 @@ public class GetUserServlet extends BasicExchangeServlet
 			else if (Const.MODE_LOGIN.equals(lvMode))
 			{
 				lvUser = LoginUtils.loginUser(lvLogin, lvPassword);
+			}
+			else if (Const.MODE_LOGOUT.equals(lvMode))
+			{
+				LoginUtils.logDriverLogout(lvLogin);
+
+				lvOOS = new ObjectOutputStream(pmResponse.getOutputStream());
+				lvOOS.writeObject(Const.MESSAGE_OK);
+
+				return;
 			}
 
 			if (lvUser != null)

@@ -22,6 +22,9 @@ import javax.swing.JTextField;
 import pl.edu.wszib.msmolen.mt.client.process.LoginProcess;
 import pl.edu.wszib.msmolen.mt.client.process.RegisterProcess;
 import pl.edu.wszib.msmolen.mt.client.utils.TokenManager;
+import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
+import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.auth.UserType;
 
 public class StartWindow extends JFrame
 {
@@ -31,6 +34,7 @@ public class StartWindow extends JFrame
 	private final JLayeredPane mLayeredPanel;
 
 	private final JPanel mCallTaxiPanel;
+	private final JPanel mDriverPanel;
 
 	private final JPanel mMainPanel;
 
@@ -121,13 +125,21 @@ public class StartWindow extends JFrame
 		mLayeredPanel.setLocation(0, 0);
 
 		mCallTaxiPanel = new CallTaxiPanel(mLayeredPanel);
+		mDriverPanel = new DriverPanel(mLayeredPanel);
 
 		mLayeredPanel.add(mMainPanel, new Integer(10));
 		mLayeredPanel.add(mCallTaxiPanel, new Integer(0));
+		mLayeredPanel.add(mDriverPanel, new Integer(0));
 
 		this.add(mLayeredPanel);
 	}
 
+	/**
+	 * Wyswietla komunikat bledu
+	 * 
+	 * @param pmTitle
+	 * @param pmMessage
+	 */
 	public void displayErrorMessage(String pmTitle, String pmMessage)
 	{
 		JOptionPane.showMessageDialog(this, pmMessage, pmTitle, JOptionPane.WARNING_MESSAGE);
@@ -141,14 +153,33 @@ public class StartWindow extends JFrame
 			if (mLoginButton.equals(evt.getSource()))
 			{
 				new LoginProcess(StartWindow.this, mLoginField.getText(), mPassword.getPassword()).process();
+				showProperWindow(UserManager.getInstance().getUser());
 			}
 			else if (mRegisterButton.equals(evt.getSource()))
 			{
 				new RegisterProcess(StartWindow.this, mLoginField.getText(), mPassword.getPassword()).process();
+				showProperWindow(UserManager.getInstance().getUser());
 			}
 			else if (mCallTaxiButton.equals(evt.getSource()))
 			{
 				mLayeredPanel.setLayer(mCallTaxiPanel, 10, 0);
+			}
+		}
+
+		/**
+		 * W zaleznosci od uzytkownika wyswietla panel klienta lub taksowkarza
+		 * 
+		 * @param pmUser
+		 */
+		private void showProperWindow(User pmUser)
+		{
+			if (pmUser != null)
+			{
+				if (pmUser.getUserType() == UserType.CLIENT)
+					mLayeredPanel.setLayer(mCallTaxiPanel, 10, 0);
+				else if (pmUser.getUserType() == UserType.DRIVER)
+					mLayeredPanel.setLayer(mDriverPanel, 10, 0);
+
 			}
 		}
 	}
