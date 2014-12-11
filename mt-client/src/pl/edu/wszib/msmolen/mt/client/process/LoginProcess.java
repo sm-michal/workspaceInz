@@ -24,16 +24,9 @@ public class LoginProcess extends AbstractProcess
 	}
 
 	@Override
-	protected URL getURL()
+	protected URL getURL() throws Exception
 	{
-		try
-		{
-			return new URL("https://localhost:8443/mt-server/exchange/getUser");
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
+		return new URL("https://localhost:8443/mt-server/exchange/getUser");
 	}
 
 	@Override

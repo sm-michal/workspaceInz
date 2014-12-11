@@ -5,32 +5,33 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 
+import pl.edu.wszib.msmolen.mt.client.gui.DriverPanel;
 import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
-import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
+import pl.edu.wszib.msmolen.mt.common.utils.Orders;
 
-public class LogoutProcess extends AbstractProcess
+public class CheckOrdersProcess extends AbstractProcess
 {
-	private final String mUserName;
+	private final DriverPanel mDriverPanel;
 
-	public LogoutProcess(StartWindow pmWindow, String pmUserName)
+	public CheckOrdersProcess(StartWindow pmWindow, DriverPanel pmPanel)
 	{
 		super(pmWindow);
 
-		mUserName = pmUserName;
+		mDriverPanel = pmPanel;
 	}
 
 	@Override
 	protected URL getURL() throws Exception
 	{
-		return new URL("https://localhost:8443/mt-server/exchange/getUser");
+		return new URL("https://localhost:8443/mt-server/exchange/checkOrders");
 	}
 
 	@Override
 	protected void sendRequest(ObjectOutputStream pmOutput) throws IOException
 	{
-		pmOutput.writeObject(Const.MODE_LOGOUT);
-		pmOutput.writeObject(mUserName);
+		// TODO
+		pmOutput.writeObject(new Integer(123));
 	}
 
 	@Override
@@ -39,7 +40,16 @@ public class LogoutProcess extends AbstractProcess
 		String lvResponse = (String) pmInput.readObject();
 		if (Const.MESSAGE_OK.equals(lvResponse))
 		{
-			UserManager.getInstance().setUser(null);
+			Object lvResult = pmInput.readObject();
+			if (lvResult instanceof String && Const.MESSAGE_NOTHING.equals(lvResult))
+			{
+				mDriverPanel.showNothingToDoLabel();
+			}
+			else if (lvResult instanceof Orders)
+			{
+				mDriverPanel.stopTimer();
+
+			}
 		}
 		else
 		{

@@ -89,7 +89,7 @@ public abstract class BasicExchangeServlet extends HttpServlet
 		}
 		catch (Exception e)
 		{
-			throw new ApplicationException("Błąd", "Wystąpił nieoczekiwany błąd.s");
+			throw new ApplicationException("Błąd", "Wystąpił nieoczekiwany błąd." + e.getMessage());
 		}
 		finally
 		{

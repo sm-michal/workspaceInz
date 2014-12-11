@@ -178,8 +178,11 @@ public class StartWindow extends JFrame
 				if (pmUser.getUserType() == UserType.CLIENT)
 					mLayeredPanel.setLayer(mCallTaxiPanel, 10, 0);
 				else if (pmUser.getUserType() == UserType.DRIVER)
+				{
 					mLayeredPanel.setLayer(mDriverPanel, 10, 0);
 
+					((DriverPanel) mDriverPanel).startTimer();
+				}
 			}
 		}
 	}

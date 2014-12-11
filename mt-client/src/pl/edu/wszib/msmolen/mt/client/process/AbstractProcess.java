@@ -71,7 +71,7 @@ public abstract class AbstractProcess
 		}
 	}
 
-	protected abstract URL getURL();
+	protected abstract URL getURL() throws Exception;
 
 	protected abstract void sendRequest(ObjectOutputStream pmOutput) throws IOException;
 
