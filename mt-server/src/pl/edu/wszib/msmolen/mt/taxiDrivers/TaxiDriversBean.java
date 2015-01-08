@@ -61,7 +61,8 @@ public class TaxiDriversBean
 								lvResult.getInt(4),
 								lvResult.getString(5),
 								lvResult.getString(6).toCharArray(),
-								UserType.DRIVER)));
+								UserType.DRIVER,
+								lvResult.getInt(1))));
 			}
 		}
 		catch (Exception e)
@@ -149,7 +150,7 @@ public class TaxiDriversBean
 			lvConn = DbUtils.getConnection();
 			lvConn.setAutoCommit(false);
 
-			User lvUser = LoginUtils.registerUser(lvConn, pmDriver.getUser().getName(), EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())));
+			User lvUser = LoginUtils.registerUser(lvConn, pmDriver.getUser().getName(), EncryptUtils.encrypt(new String(pmDriver.getUser().getPassword())), false);
 
 			lvStmt = lvConn.prepareStatement("INSERT INTO MT_TAKSOWKARZE (ID, IMIE, NAZWISKO, UZYTKOWNIK_ID) VALUES (NEXTVAL('MT_TAKSOWKARZE_SEQ'), ?, ?, ?)");
 			lvStmt.setString(1, pmDriver.getName());

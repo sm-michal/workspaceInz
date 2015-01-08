@@ -16,7 +16,7 @@ public class CustomUser implements CustomPrincipal
 	protected CustomUser(int pmId, String pmName, String pmPassword, List<MenuItem> pmMenuItems, List<CustomRole> pmRoles, UserType pmUserType)
 	{
 		mName = pmName;
-		mUserObject = new User(pmId, pmName, pmPassword.toCharArray(), pmUserType);
+		mUserObject = new User(pmId, pmName, pmPassword.toCharArray(), pmUserType, null);
 		mMenuItems = pmMenuItems;
 		mRoles = pmRoles;
 	}

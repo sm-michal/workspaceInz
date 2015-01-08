@@ -35,19 +35,29 @@ public class LoginUtils
 		try
 		{
 			lvConn = DbUtils.getConnection();
-			lvStmt = lvConn.prepareStatement("SELECT U.ID, U.NAZWA_UZYTKOWNIKA, U.HASLO, T.ID FROM MT_UZYTKOWNICY U "
+			lvStmt = lvConn.prepareStatement("SELECT U.ID, U.NAZWA_UZYTKOWNIKA, U.HASLO, T.ID, K.ID FROM MT_UZYTKOWNICY U "
 					+ "LEFT JOIN MT_TAKSOWKARZE T ON T.UZYTKOWNIK_ID = U.ID "
+					+ "LEFT JOIN MT_KLIENCI K ON K.UZYTKOWNIK_ID = U.ID "
 					+ "WHERE U.NAZWA_UZYTKOWNIKA = ? AND U.HASLO = ?");
 			lvStmt.setString(1, pmUserName);
 			lvStmt.setString(2, pmPassword);
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
 			{
+				UserType lvType = null;
+				Integer lvForeignId = null;
 				if (lvResult.getString(4) != null)
 				{
 					logDriverLogin(lvConn, lvResult.getInt(4));
+					lvType = UserType.DRIVER;
+					lvForeignId = lvResult.getInt(4);
 				}
-				return new User(lvResult.getInt(1), lvResult.getString(2), lvResult.getString(3).toCharArray(), lvResult.getString(4) != null ? UserType.DRIVER : UserType.CLIENT);
+				else if (lvResult.getString(5) != null)
+				{
+					lvType = UserType.CLIENT;
+					lvForeignId = lvResult.getInt(5);
+				}
+				return new User(lvResult.getInt(1), lvResult.getString(2), lvResult.getString(3).toCharArray(), lvType, lvForeignId);
 			}
 			else
 				throw new ApplicationException("Błąd logowania", "Logowanie nie powiodło się. Podano nieprawidłowy login lub hasło.");
@@ -147,7 +157,7 @@ public class LoginUtils
 		try
 		{
 			lvConn = DbUtils.getConnection();
-			return registerUser(lvConn, pmUserName, pmPassword);
+			return registerUser(lvConn, pmUserName, pmPassword, true);
 		}
 		catch (ApplicationException e)
 		{
@@ -164,22 +174,45 @@ public class LoginUtils
 		}
 	}
 
-	public static User registerUser(Connection pmConnection, String pmUserName, String pmPassword) throws ApplicationException
+	public static User registerUser(Connection pmConnection, String pmUserName, String pmPassword, boolean isRegisterCustomer) throws ApplicationException
 	{
 		PreparedStatement lvStmt = null;
 		ResultSet lvResult = null;
+
+		PreparedStatement lvStmtCustomer = null;
+		ResultSet lvResultCustomer = null;
 		try
 		{
 			lvStmt = pmConnection.prepareStatement("INSERT INTO MT_UZYTKOWNICY (ID, NAZWA_UZYTKOWNIKA, HASLO) "
 					+ "(SELECT NEXTVAL('MT_UZYTKOWNICY_SEQ'), ?, ? "
 					+ "WHERE (SELECT COUNT(*) FROM MT_UZYTKOWNICY WHERE NAZWA_UZYTKOWNIKA = ?) = 0) RETURNING ID");
+
+			lvStmtCustomer = pmConnection.prepareStatement("INSERT INTO MT_KLIENCI (ID, UZYTKOWNIK_ID) "
+					+ "(SELECT NEXTVAL('MT_KLIENCI_SEQ'), ?) RETURNING ID");
+
 			lvStmt.setString(1, pmUserName);
 			lvStmt.setString(2, pmPassword);
 			lvStmt.setString(3, pmUserName);
 			lvResult = lvStmt.executeQuery();
 			if (lvResult.next())
 			{
-				return new User(lvResult.getInt(1), pmUserName, pmPassword.toCharArray(), UserType.CLIENT);
+				if (isRegisterCustomer)
+				{
+					lvStmtCustomer.setInt(1, lvResult.getInt(1));
+					lvResultCustomer = lvStmtCustomer.executeQuery();
+					if (lvResultCustomer.next())
+					{
+						return new User(lvResult.getInt(1), pmUserName, pmPassword.toCharArray(), UserType.CLIENT, lvResultCustomer.getInt(1));
+					}
+					else
+					{
+						throw new ApplicationException("Błąd rejestracji", "Nie udało się utworzyć konta.");
+					}
+				}
+				else
+				{
+					return new User(lvResult.getInt(1), pmUserName, pmPassword.toCharArray(), UserType.CLIENT, null);
+				}
 			}
 			else
 			{
@@ -199,7 +232,7 @@ public class LoginUtils
 		}
 		finally
 		{
-			DbUtils.close(lvResult, lvStmt);
+			DbUtils.close(lvResultCustomer, lvResult, lvStmtCustomer, lvStmt);
 		}
 	}
 }

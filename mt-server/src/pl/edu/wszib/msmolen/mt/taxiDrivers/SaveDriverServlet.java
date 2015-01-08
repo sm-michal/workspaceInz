@@ -127,7 +127,7 @@ public class SaveDriverServlet extends HttpServlet
 			if (lvUserIdStr != null && !"".equals(lvUserIdStr))
 				lvUserId = Integer.parseInt(lvUserIdStr);
 
-			TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray(), UserType.DRIVER));
+			TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, lvPassword.toCharArray(), UserType.DRIVER, lvId));
 
 			if (pmOperation == TaxiDriverOperation.EMPLOY)
 				lvBean.create(lvDriver);
@@ -159,7 +159,7 @@ public class SaveDriverServlet extends HttpServlet
 		if (lvUserIdStr != null && !"".equals(lvUserIdStr))
 			lvUserId = Integer.parseInt(lvUserIdStr);
 
-		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, new char[0], UserType.DRIVER));
+		TaxiDriver lvDriver = new TaxiDriver(lvId, lvName, lvSurname, new User(lvUserId, lvLogin, new char[0], UserType.DRIVER, lvId));
 		pmRequest.setAttribute(TaxiDriver.class.getSimpleName(), lvDriver);
 	}
 

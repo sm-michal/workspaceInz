@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -131,6 +133,25 @@ public class CallTaxiPanel extends JPanel
 				}
 
 				mParent.moveToBack(mPanel);
+			}
+
+			else if (mCallTaxiButton.equals(evt.getSource()))
+			{
+				final ChooseLocationDialog lvDialog = new ChooseLocationDialog((StartWindow) mParent.getRootPane().getParent());
+				lvDialog.addWindowListener(new WindowAdapter()
+				{
+					@Override
+					public void windowClosed(WindowEvent e)
+					{
+
+						if (lvDialog.getCoordinates() != null)
+						{
+							System.out.println(lvDialog.getCoordinates()[0] + " " + lvDialog.getCoordinates()[1]);
+						}
+					}
+				});
+
+				lvDialog.setVisible(true);
 			}
 		}
 	}

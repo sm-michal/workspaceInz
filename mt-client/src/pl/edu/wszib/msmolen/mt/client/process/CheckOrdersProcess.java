@@ -7,6 +7,7 @@ import java.net.URL;
 
 import pl.edu.wszib.msmolen.mt.client.gui.DriverPanel;
 import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
+import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 import pl.edu.wszib.msmolen.mt.common.utils.Orders;
 
@@ -30,8 +31,7 @@ public class CheckOrdersProcess extends AbstractProcess
 	@Override
 	protected void sendRequest(ObjectOutputStream pmOutput) throws IOException
 	{
-		// TODO
-		pmOutput.writeObject(new Integer(123));
+		pmOutput.writeObject(UserManager.getInstance().getUser().getForeignId());
 	}
 
 	@Override
@@ -49,7 +49,9 @@ public class CheckOrdersProcess extends AbstractProcess
 			{
 				mDriverPanel.stopTimer();
 
+				mDriverPanel.loadMapOntoPanel((byte[]) pmInput.readObject());
 			}
+
 		}
 		else
 		{

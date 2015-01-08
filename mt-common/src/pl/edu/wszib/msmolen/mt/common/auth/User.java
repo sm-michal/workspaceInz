@@ -10,13 +10,15 @@ public class User implements Serializable
 	private final String name;
 	private final char[] password;
 	private final UserType userType;
+	private final Integer foreignId;
 
-	public User(int pmId, String pmName, char[] pmPassword, UserType pmUserType)
+	public User(int pmId, String pmName, char[] pmPassword, UserType pmUserType, Integer pmForeignId)
 	{
 		id = pmId;
 		name = pmName;
 		password = pmPassword;
 		userType = pmUserType;
+		foreignId = pmForeignId;
 	}
 
 	public int getId()
@@ -37,5 +39,10 @@ public class User implements Serializable
 	public UserType getUserType()
 	{
 		return userType;
+	}
+
+	public Integer getForeignId()
+	{
+		return foreignId;
 	}
 }

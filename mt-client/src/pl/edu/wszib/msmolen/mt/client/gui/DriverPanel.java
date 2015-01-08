@@ -7,10 +7,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import pl.edu.wszib.msmolen.mt.client.process.CheckOrdersProcess;
@@ -33,6 +35,18 @@ public class DriverPanel extends JPanel
 
 	private final JButton mBackButton;
 	private final JLabel mNothingToDoLabel;
+
+	private final JPanel mOrderPanel;
+
+	private final JLabel mWaitingTitle;
+	private final JLabel mWaitingText;
+
+	private final JLabel mDestinationTitle;
+	private final JLabel mDestinationText;
+
+	private final JLabel mMapLabel;
+
+	private final JScrollPane mScrollMapPane;
 
 	private final ActionListener listener;
 
@@ -63,6 +77,39 @@ public class DriverPanel extends JPanel
 		mNothingToDoLabel.setVisible(false);
 		this.add(mNothingToDoLabel);
 
+		mOrderPanel = new JPanel(null);
+		mOrderPanel.setSize(getWidth() - 2, getHeight() - 31);
+		mOrderPanel.setLocation(1, 30);
+		mOrderPanel.setVisible(true);
+		this.add(mOrderPanel);
+
+		mWaitingTitle = new JLabel("Miejsce oczekiwania:");
+		mWaitingTitle.setSize(130, 20);
+		mWaitingTitle.setLocation(5, 0);
+		mOrderPanel.add(mWaitingTitle);
+
+		mWaitingText = new JLabel("");
+		mWaitingText.setSize(getWidth() - 10, 20);
+		mWaitingText.setLocation(5, 20);
+		mOrderPanel.add(mWaitingText);
+
+		mDestinationTitle = new JLabel(" Miejsce docelowe:");
+		mDestinationTitle.setSize(130, 20);
+		mDestinationTitle.setLocation(5, 40);
+		mOrderPanel.add(mDestinationTitle);
+
+		mDestinationText = new JLabel("");
+		mDestinationText.setSize(getWidth() - 10, 20);
+		mDestinationText.setLocation(5, 60);
+		mOrderPanel.add(mDestinationText);
+
+		mMapLabel = new JLabel();
+
+		mScrollMapPane = new JScrollPane(mMapLabel);
+		mScrollMapPane.setSize(getWidth() - 10, getHeight() - 120);
+		mScrollMapPane.setLocation(5, 80);
+		mOrderPanel.add(mScrollMapPane);
+
 	}
 
 	/**
@@ -70,7 +117,7 @@ public class DriverPanel extends JPanel
 	 */
 	public void showNothingToDoLabel()
 	{
-		mNothingToDoLabel.setVisible(true);
+		// mNothingToDoLabel.setVisible(true);
 	}
 
 	/**
@@ -89,9 +136,22 @@ public class DriverPanel extends JPanel
 		}, 0, 10000);
 	}
 
+	/**
+	 * Zatrzymuje timer
+	 */
 	public void stopTimer()
 	{
 		mCheckOrdersTimer.cancel();
+	}
+
+	/**
+	 * Wyswietla mape w panelu
+	 * 
+	 * @param pmImageFile
+	 */
+	public void loadMapOntoPanel(byte[] pmData)
+	{
+		mMapLabel.setIcon(new ImageIcon(pmData));
 	}
 
 	private class ButtonActionListener implements ActionListener

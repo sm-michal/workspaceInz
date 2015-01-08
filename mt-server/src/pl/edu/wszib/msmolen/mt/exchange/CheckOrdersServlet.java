@@ -1,12 +1,15 @@
 package pl.edu.wszib.msmolen.mt.exchange;
 
+import java.io.File;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 import pl.edu.wszib.msmolen.mt.common.utils.Orders;
+import pl.edu.wszib.msmolen.mt.exchange.map.MapRequest;
 
 /**
  * Servlet pobierajacy aktualne zlecenie dla taksowkarza
@@ -23,6 +26,8 @@ public class CheckOrdersServlet extends BasicExchangeServlet
 	protected void processRequest(HttpServletResponse pmResponse, Object[] pmObjects) throws Exception
 	{
 		ObjectOutputStream lvOOS = null;
+
+		File lvMapFile = null;
 		try
 		{
 			int lvDriverId = (int) pmObjects[0];
@@ -31,6 +36,11 @@ public class CheckOrdersServlet extends BasicExchangeServlet
 			lvOOS = new ObjectOutputStream(pmResponse.getOutputStream());
 			lvOOS.writeObject(Const.MESSAGE_OK);
 			lvOOS.writeObject(lvOrders != null ? lvOrders : Const.MESSAGE_NOTHING);
+			if (lvOrders != null)
+			{
+				lvMapFile = MapRequest.getMapImage();
+				lvOOS.writeObject(Files.readAllBytes(lvMapFile.toPath()));
+			}
 		}
 		finally
 		{
@@ -42,12 +52,15 @@ public class CheckOrdersServlet extends BasicExchangeServlet
 				catch (Exception e)
 				{
 				}
+
+			if (lvMapFile != null)
+				lvMapFile.delete();
 		}
 	}
 
 	private Orders getActualOrder(int pmDriverId)
 	{
-		return null;
+		return new Orders();
 	}
 
 }
