@@ -10,7 +10,7 @@ public class Location
 	private static final double POWER_OF_2 = Math.pow(2, 7 + ZOOM);
 
 	private static final int MAP_CENTER_X = 320;
-	private static final int MAP_CENTER_Y = 240;
+	private static final int MAP_CENTER_Y = 320;
 
 	private static final double GLOBE_OFFSET = Math.pow(2, 28);
 	private static final double GLOBE_RADIUS = Math.pow(2, 28) / Math.PI;
@@ -52,10 +52,64 @@ public class Location
 				) / C;
 	}
 
+	/**
+	 * Oblicza wspolrzedna X punktu na podstawie dlugosci geograficznej
+	 * 
+	 * @see http://stackoverflow.com/questions/2651099/convert-long-lat-to-pixel-x-y-on-a-given-picture
+	 * 
+	 * @param pmLongitude
+	 * @return wspolrzedna X
+	 */
+	public static int calculateX(double pmLongitude)
+	{
+		int lvX = longitudeToX(pmLongitude);
+		int lvStartX = longitudeToX(LONGITUDE);
+		return (int) (MAP_CENTER_X + (lvX - lvStartX) / Math.pow(2, 28 - 7 - ZOOM));
+	}
+
+	/**
+	 * Oblicza wspolrzedna Y na podstawie szerokosci geograficznej
+	 * 
+	 * @see http://stackoverflow.com/questions/2651099/convert-long-lat-to-pixel-x-y-on-a-given-picture
+	 * 
+	 * @param pmLattitude
+	 * @return
+	 */
+	public static int calculateY(double pmLattitude)
+	{
+		int lvY = (int) lattitudeToY(pmLattitude);
+		int lvStartY = (int) lattitudeToY(LATTITUDE);
+
+		return (int) (MAP_CENTER_Y + (lvY - lvStartY) / Math.pow(2, 28 - 7 - ZOOM));
+	}
+
+	/**
+	 * Oblicza wspolrzedna Y na podstawie szerokosci geograficznej.
+	 * Zwraca bezwzgledny wynik w odniesieniu do poczatku ukladu, przy maksymalnym powiekszeniu
+	 * 
+	 * @see http://stackoverflow.com/questions/2651099/convert-long-lat-to-pixel-x-y-on-a-given-picture
+	 * 
+	 * @param pmLattitude
+	 * @return wpolrzedna Y
+	 */
 	private static double lattitudeToY(double pmLattitude)
 	{
 		return Math.round(GLOBE_OFFSET - GLOBE_RADIUS *
 				Math.log((1 + Math.sin(pmLattitude * P)) /
 						(1 - Math.sin(pmLattitude * P))) / 2);
+	}
+
+	/**
+	 * Oblicza wspolrzedna Y na podstawie dlugosci geograficznej.
+	 * Zwraca bezwzgledny wynik w odniesieniu do poczatku ukladu, przy maksymalnym powiekszeniu.
+	 * 
+	 * @see http://stackoverflow.com/questions/2651099/convert-long-lat-to-pixel-x-y-on-a-given-picture
+	 * 
+	 * @param pmLongitude
+	 * @return wpolrzedna X
+	 */
+	private static int longitudeToX(double pmLongitude)
+	{
+		return (int) Math.round(GLOBE_OFFSET + GLOBE_RADIUS * pmLongitude * P);
 	}
 }

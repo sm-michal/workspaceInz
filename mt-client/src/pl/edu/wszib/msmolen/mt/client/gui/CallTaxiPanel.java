@@ -39,6 +39,8 @@ public class CallTaxiPanel extends JPanel
 
 	private final ActionListener listener;
 
+	private double[] mCoordinates;
+
 	public CallTaxiPanel(JLayeredPane pmParent)
 	{
 		mParent = pmParent;
@@ -115,6 +117,7 @@ public class CallTaxiPanel extends JPanel
 		mCallTaxiButton.setSize(200, 30);
 		mCallTaxiButton.setLocation(5, 245);
 		mCallTaxiButton.addActionListener(listener);
+		mCallTaxiButton.setEnabled(false);
 		this.add(mCallTaxiButton);
 
 	}
@@ -145,20 +148,35 @@ public class CallTaxiPanel extends JPanel
 			else if (mChooseLocationButton.equals(evt.getSource()))
 			{
 				final ChooseLocationDialog lvDialog = new ChooseLocationDialog((StartWindow) mParent.getRootPane().getParent());
+				lvDialog.setCoordinates(mCoordinates);
 				lvDialog.addWindowListener(new WindowAdapter()
 				{
 					@Override
 					public void windowClosed(WindowEvent e)
 					{
-
 						if (lvDialog.getCoordinates() != null)
 						{
-							System.out.println(lvDialog.getCoordinates()[0] + " " + lvDialog.getCoordinates()[1]);
+							mCoordinates = lvDialog.getCoordinates();
+							mChooseLocationButton.setText("Zmieñ lokalizacjê");
+							mCallTaxiButton.setEnabled(true);
+						}
+						else
+						{
+							if (mCoordinates == null)
+							{
+								mChooseLocationButton.setText("Wska¿ lokalizacjê");
+								mCallTaxiButton.setEnabled(false);
+							}
 						}
 					}
+
 				});
 
 				lvDialog.setVisible(true);
+			}
+			else if (mCallTaxiButton.equals(evt.getSource()))
+			{
+
 			}
 		}
 	}

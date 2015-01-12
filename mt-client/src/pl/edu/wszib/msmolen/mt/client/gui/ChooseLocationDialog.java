@@ -89,6 +89,17 @@ public class ChooseLocationDialog extends JDialog
 
 	}
 
+	public void setCoordinates(double[] pmCoordinates)
+	{
+		if (pmCoordinates != null)
+		{
+			mLongitude = pmCoordinates[0];
+			mLattitude = pmCoordinates[1];
+
+			mLocation = new Point(Location.calculateX(mLongitude), Location.calculateY(mLattitude));
+		}
+	}
+
 	public double[] getCoordinates()
 	{
 		return mLattitude == null || mLongitude == null ? null : new double[] { mLattitude, mLongitude };
