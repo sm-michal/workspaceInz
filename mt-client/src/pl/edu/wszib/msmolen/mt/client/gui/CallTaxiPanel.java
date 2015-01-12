@@ -32,9 +32,10 @@ public class CallTaxiPanel extends JPanel
 	private final JCheckBox mLuggageTaxi;
 	private final JCheckBox mCombiTaxiCheckBox;
 
-	private final JButton mCallTaxiButton;
+	private final JButton mChooseLocationButton;
 	private final JButton mCheckPriceButton;
 	private final JButton mCheckTimeButton;
+	private final JButton mCallTaxiButton;
 
 	private final ActionListener listener;
 
@@ -92,11 +93,11 @@ public class CallTaxiPanel extends JPanel
 		mLuggageTaxi.setLocation(5, 105);
 		this.add(mLuggageTaxi);
 
-		mCallTaxiButton = new JButton("Zamów taksówkê");
-		mCallTaxiButton.setSize(200, 30);
-		mCallTaxiButton.setLocation(5, 140);
-		mCallTaxiButton.addActionListener(listener);
-		this.add(mCallTaxiButton);
+		mChooseLocationButton = new JButton("Wska¿ lokalizacjê");
+		mChooseLocationButton.setSize(200, 30);
+		mChooseLocationButton.setLocation(5, 140);
+		mChooseLocationButton.addActionListener(listener);
+		this.add(mChooseLocationButton);
 
 		mCheckPriceButton = new JButton("SprawdŸ cenê");
 		mCheckPriceButton.setSize(200, 30);
@@ -109,6 +110,12 @@ public class CallTaxiPanel extends JPanel
 		mCheckTimeButton.setLocation(5, 210);
 		mCheckTimeButton.addActionListener(listener);
 		this.add(mCheckTimeButton);
+
+		mCallTaxiButton = new JButton("Zamów taksówkê");
+		mCallTaxiButton.setSize(200, 30);
+		mCallTaxiButton.setLocation(5, 245);
+		mCallTaxiButton.addActionListener(listener);
+		this.add(mCallTaxiButton);
 
 	}
 
@@ -135,7 +142,7 @@ public class CallTaxiPanel extends JPanel
 				mParent.moveToBack(mPanel);
 			}
 
-			else if (mCallTaxiButton.equals(evt.getSource()))
+			else if (mChooseLocationButton.equals(evt.getSource()))
 			{
 				final ChooseLocationDialog lvDialog = new ChooseLocationDialog((StartWindow) mParent.getRootPane().getParent());
 				lvDialog.addWindowListener(new WindowAdapter()
