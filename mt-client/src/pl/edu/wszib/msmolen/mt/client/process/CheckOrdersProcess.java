@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 
 import pl.edu.wszib.msmolen.mt.client.gui.DriverPanel;
-import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 import pl.edu.wszib.msmolen.mt.common.utils.Orders;
@@ -15,10 +14,8 @@ public class CheckOrdersProcess extends AbstractProcess
 {
 	private final DriverPanel mDriverPanel;
 
-	public CheckOrdersProcess(StartWindow pmWindow, DriverPanel pmPanel)
+	public CheckOrdersProcess(DriverPanel pmPanel)
 	{
-		super(pmWindow);
-
 		mDriverPanel = pmPanel;
 	}
 

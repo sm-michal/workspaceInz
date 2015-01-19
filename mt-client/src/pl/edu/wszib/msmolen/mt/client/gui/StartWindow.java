@@ -53,9 +53,19 @@ public class StartWindow extends JFrame
 	private final int WIDTH = 240;
 	private final int HEIGHT = 400;
 
+	private static StartWindow instance = null;
+
+	public static StartWindow getInstance()
+	{
+		if (instance == null)
+			instance = new StartWindow();
+
+		return instance;
+	}
+
 	public static void startGUI()
 	{
-		new StartWindow().setVisible(true);
+		getInstance().setVisible(true);
 	}
 
 	private StartWindow()
@@ -152,12 +162,12 @@ public class StartWindow extends JFrame
 		{
 			if (mLoginButton.equals(evt.getSource()))
 			{
-				new LoginProcess(StartWindow.this, mLoginField.getText(), mPassword.getPassword()).process();
+				new LoginProcess(mLoginField.getText(), mPassword.getPassword()).process();
 				showProperWindow(UserManager.getInstance().getUser());
 			}
 			else if (mRegisterButton.equals(evt.getSource()))
 			{
-				new RegisterProcess(StartWindow.this, mLoginField.getText(), mPassword.getPassword()).process();
+				new RegisterProcess(mLoginField.getText(), mPassword.getPassword()).process();
 				showProperWindow(UserManager.getInstance().getUser());
 			}
 			else if (mCallTaxiButton.equals(evt.getSource()))

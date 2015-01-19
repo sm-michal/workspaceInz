@@ -8,16 +8,14 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
-import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 
 public class DownloadMapProcess extends AbstractProcess
 {
 	private JLabel mMapLabel = new JLabel();
 
-	public DownloadMapProcess(StartWindow pmWindow, JLabel pmLabel)
+	public DownloadMapProcess(JLabel pmLabel)
 	{
-		super(pmWindow);
 		mMapLabel = pmLabel;
 	}
 

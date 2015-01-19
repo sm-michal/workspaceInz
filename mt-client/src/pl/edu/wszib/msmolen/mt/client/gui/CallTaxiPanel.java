@@ -12,10 +12,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import pl.edu.wszib.msmolen.mt.client.process.LogoutProcess;
+import pl.edu.wszib.msmolen.mt.client.process.OrderTaxiProcess;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.auth.User;
 
@@ -139,7 +141,7 @@ public class CallTaxiPanel extends JPanel
 				User lvUser = UserManager.getInstance().getUser();
 				if (lvUser != null)
 				{
-					new LogoutProcess((StartWindow) mParent.getRootPane().getParent(), UserManager.getInstance().getUser().getName()).process();
+					new LogoutProcess(UserManager.getInstance().getUser().getName()).process();
 				}
 
 				mParent.moveToBack(mPanel);
@@ -176,7 +178,13 @@ public class CallTaxiPanel extends JPanel
 			}
 			else if (mCallTaxiButton.equals(evt.getSource()))
 			{
+				int lvWynik = JOptionPane.showOptionDialog(mPanel, "Czy na pewno chcesz zamówiæ taksówkê?", "Potwierdzenie zamówienia",
+						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new Object[] { "Tak", "Nie" }, "Tak");
 
+				if (lvWynik == 0)
+				{
+					new OrderTaxiProcess(mCoordinates[0], mCoordinates[1]).process();
+				}
 			}
 		}
 	}

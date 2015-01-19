@@ -5,29 +5,33 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 
-import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
+import javax.swing.JOptionPane;
+
+import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 
-public class LogoutProcess extends AbstractProcess
+public class OrderTaxiProcess extends AbstractProcess
 {
-	private final String mUserName;
+	private final double mLattitude;
+	private final double mLongitude;
 
-	public LogoutProcess(String pmUserName)
+	public OrderTaxiProcess(double pmLattitude, double pmLongitude)
 	{
-		mUserName = pmUserName;
+		mLattitude = pmLattitude;
+		mLongitude = pmLongitude;
 	}
 
 	@Override
 	protected URL getURL() throws Exception
 	{
-		return new URL("https://localhost:8443/mt-server/exchange/getUser");
+		return new URL("https://localhost:8443/mt-server/exchange/orderTaxi");
 	}
 
 	@Override
 	protected void sendRequest(ObjectOutputStream pmOutput) throws IOException
 	{
-		pmOutput.writeObject(Const.MODE_LOGOUT);
-		pmOutput.writeObject(mUserName);
+		pmOutput.writeObject(mLattitude);
+		pmOutput.writeObject(mLongitude);
 	}
 
 	@Override
@@ -36,7 +40,7 @@ public class LogoutProcess extends AbstractProcess
 		String lvResponse = (String) pmInput.readObject();
 		if (Const.MESSAGE_OK.equals(lvResponse))
 		{
-			UserManager.getInstance().setUser(null);
+			JOptionPane.showMessageDialog(StartWindow.getInstance(), "Taksówka zosta³a zamówiona. Oczekuj na przybycie.", "Informacja", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else
 		{

@@ -131,7 +131,7 @@ public class DriverPanel extends JPanel
 			@Override
 			public void run()
 			{
-				new CheckOrdersProcess((StartWindow) mParent.getRootPane().getParent(), DriverPanel.this).process();
+				new CheckOrdersProcess(DriverPanel.this).process();
 			}
 		}, 0, 10000);
 	}
@@ -170,7 +170,7 @@ public class DriverPanel extends JPanel
 			{
 				stopTimer();
 
-				new LogoutProcess((StartWindow) mParent.getRootPane().getParent(), UserManager.getInstance().getUser().getName()).process();
+				new LogoutProcess(UserManager.getInstance().getUser().getName()).process();
 				mParent.moveToBack(mPanel);
 			}
 		}

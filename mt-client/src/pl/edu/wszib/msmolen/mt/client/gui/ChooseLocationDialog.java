@@ -36,13 +36,9 @@ public class ChooseLocationDialog extends JDialog
 
 	private Point mLocation = null;
 
-	private StartWindow mMainWindow = null;
-
 	public ChooseLocationDialog(StartWindow pmParent)
 	{
 		super(pmParent, ModalityType.APPLICATION_MODAL);
-
-		mMainWindow = pmParent;
 
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((int) (screen.getWidth() - WIDTH) / 2, (int) (screen.getHeight() - HEIGHT) / 2);
@@ -107,7 +103,7 @@ public class ChooseLocationDialog extends JDialog
 
 	public void loadMapOntoWindow()
 	{
-		new DownloadMapProcess(mMainWindow, mMapLabel).process();
+		new DownloadMapProcess(mMapLabel).process();
 	}
 
 	private class ButtonActionListener implements ActionListener

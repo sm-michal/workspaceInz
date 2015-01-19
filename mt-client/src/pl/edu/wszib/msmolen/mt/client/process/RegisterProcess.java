@@ -3,16 +3,15 @@ package pl.edu.wszib.msmolen.mt.client.process;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 import pl.edu.wszib.msmolen.mt.common.utils.EncryptUtils;
 
 public class RegisterProcess extends LoginProcess
 {
 
-	public RegisterProcess(StartWindow pmParent, String pmUserName, char[] pmPassword)
+	public RegisterProcess(String pmUserName, char[] pmPassword)
 	{
-		super(pmParent, pmUserName, pmPassword);
+		super(pmUserName, pmPassword);
 	}
 
 	@Override

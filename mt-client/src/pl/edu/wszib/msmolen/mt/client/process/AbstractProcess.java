@@ -15,9 +15,9 @@ public abstract class AbstractProcess
 {
 	private final StartWindow mParentWindow;
 
-	public AbstractProcess(StartWindow pmWindow)
+	public AbstractProcess()
 	{
-		mParentWindow = pmWindow;
+		mParentWindow = StartWindow.getInstance();
 	}
 
 	public void process()

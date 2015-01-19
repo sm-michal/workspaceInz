@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 
-import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.auth.User;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
@@ -16,9 +15,8 @@ public class LoginProcess extends AbstractProcess
 	protected final String mUserName;
 	protected final char[] mPassword;
 
-	public LoginProcess(StartWindow pmParent, String pmUserName, char[] pmPassword)
+	public LoginProcess(String pmUserName, char[] pmPassword)
 	{
-		super(pmParent);
 		mUserName = pmUserName;
 		mPassword = pmPassword;
 	}
