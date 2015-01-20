@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
+import pl.edu.wszib.msmolen.mt.core.OrdersProvider;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 
 /**
@@ -25,13 +26,19 @@ public class OrderTaxiServlet extends BasicExchangeServlet implements Servlet
 	{
 		double lvLattitude = (double) pmObjects[0];
 		double lvLongitude = (double) pmObjects[1];
-		addOrder(lvLattitude, lvLongitude);
+		String lvOperation = (String) pmObjects[2];
+		int lvArriveTime = OrdersProvider.calculateTaxiArriveTime(lvLattitude, lvLongitude);
+		if (Const.ORDER_OP_ORDER.equals(lvOperation))
+		{
+			addOrder(lvLattitude, lvLongitude);
+		}
 
 		ObjectOutputStream lvOOS = null;
 		try
 		{
 			lvOOS = new ObjectOutputStream(pmResponse.getOutputStream());
 			lvOOS.writeObject(Const.MESSAGE_OK);
+			lvOOS.writeObject(lvArriveTime);
 		}
 		finally
 		{

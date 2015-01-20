@@ -42,11 +42,11 @@ public class TokenServlet extends HttpServlet
 			String lvOperacja = (String) lvOIS.readObject();
 
 			lvOOS = new ObjectOutputStream(response.getOutputStream());
-			if (Const.OPERACJA_GET_TOKEN.equals(lvOperacja))
+			if (Const.OP_GET_TOKEN.equals(lvOperacja))
 			{
 				lvOOS.writeObject(getNextToken());
 			}
-			else if (Const.OPERACJA_DISPOSE_TOKEN.equals(lvOperacja))
+			else if (Const.OP_DISPOSE_TOKEN.equals(lvOperacja))
 			{
 				disposeToken((Token) lvOIS.readObject());
 				LoginUtils.logDriverLogout((User) lvOIS.readObject());

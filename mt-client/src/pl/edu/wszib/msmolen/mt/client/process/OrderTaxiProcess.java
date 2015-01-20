@@ -8,6 +8,7 @@ import java.net.URL;
 import javax.swing.JOptionPane;
 
 import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
+import pl.edu.wszib.msmolen.mt.client.utils.ClientUtils;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 
 public class OrderTaxiProcess extends AbstractProcess
@@ -15,10 +16,13 @@ public class OrderTaxiProcess extends AbstractProcess
 	private final double mLattitude;
 	private final double mLongitude;
 
-	public OrderTaxiProcess(double pmLattitude, double pmLongitude)
+	private final String mOperation;
+
+	public OrderTaxiProcess(double pmLattitude, double pmLongitude, String pmOperation)
 	{
 		mLattitude = pmLattitude;
 		mLongitude = pmLongitude;
+		mOperation = pmOperation;
 	}
 
 	@Override
@@ -32,6 +36,7 @@ public class OrderTaxiProcess extends AbstractProcess
 	{
 		pmOutput.writeObject(mLattitude);
 		pmOutput.writeObject(mLongitude);
+		pmOutput.writeObject(mOperation);
 	}
 
 	@Override
@@ -40,7 +45,12 @@ public class OrderTaxiProcess extends AbstractProcess
 		String lvResponse = (String) pmInput.readObject();
 		if (Const.MESSAGE_OK.equals(lvResponse))
 		{
-			JOptionPane.showMessageDialog(StartWindow.getInstance(), "Taksówka zosta³a zamówiona. Oczekuj na przybycie.", "Informacja", JOptionPane.INFORMATION_MESSAGE);
+			int lvTime = (int) pmInput.readObject();
+			JOptionPane.showMessageDialog(
+					StartWindow.getInstance(),
+					(Const.ORDER_OP_ORDER.equals(mOperation) ? "Taksówka zosta³a zamówiona. " : "") + "Czas oczekiwania na przybycie: "
+							+ ClientUtils.getTimeMessage(lvTime) + ".", "Informacja",
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 		else
 		{

@@ -44,7 +44,7 @@ public class TokenManager
 				lvConnection.setRequestMethod("POST");
 
 				lvOOS = new ObjectOutputStream(lvConnection.getOutputStream());
-				lvOOS.writeObject(Const.OPERACJA_GET_TOKEN);
+				lvOOS.writeObject(Const.OP_GET_TOKEN);
 
 				lvOIS = new ObjectInputStream(lvConnection.getInputStream());
 				token = (Token) lvOIS.readObject();
@@ -92,7 +92,7 @@ public class TokenManager
 			lvConnection.setRequestMethod("POST");
 
 			lvOOS = new ObjectOutputStream(lvConnection.getOutputStream());
-			lvOOS.writeObject(Const.OPERACJA_DISPOSE_TOKEN);
+			lvOOS.writeObject(Const.OP_DISPOSE_TOKEN);
 			lvOOS.writeObject(token);
 			lvOOS.writeObject(UserManager.getInstance().getUser());
 

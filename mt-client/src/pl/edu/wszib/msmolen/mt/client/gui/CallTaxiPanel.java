@@ -20,6 +20,7 @@ import pl.edu.wszib.msmolen.mt.client.process.LogoutProcess;
 import pl.edu.wszib.msmolen.mt.client.process.OrderTaxiProcess;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.auth.User;
+import pl.edu.wszib.msmolen.mt.common.exchange.Const;
 
 public class CallTaxiPanel extends JPanel
 {
@@ -107,12 +108,14 @@ public class CallTaxiPanel extends JPanel
 		mCheckPriceButton.setSize(200, 30);
 		mCheckPriceButton.setLocation(5, 175);
 		mCheckPriceButton.addActionListener(listener);
+		mCheckPriceButton.setEnabled(false);
 		this.add(mCheckPriceButton);
 
 		mCheckTimeButton = new JButton("SprawdŸ czas oczekiwania");
 		mCheckTimeButton.setSize(200, 30);
 		mCheckTimeButton.setLocation(5, 210);
 		mCheckTimeButton.addActionListener(listener);
+		mCheckTimeButton.setEnabled(false);
 		this.add(mCheckTimeButton);
 
 		mCallTaxiButton = new JButton("Zamów taksówkê");
@@ -161,6 +164,8 @@ public class CallTaxiPanel extends JPanel
 							mCoordinates = lvDialog.getCoordinates();
 							mChooseLocationButton.setText("Zmieñ lokalizacjê");
 							mCallTaxiButton.setEnabled(true);
+							mCheckPriceButton.setEnabled(true);
+							mCheckTimeButton.setEnabled(true);
 						}
 						else
 						{
@@ -168,6 +173,8 @@ public class CallTaxiPanel extends JPanel
 							{
 								mChooseLocationButton.setText("Wska¿ lokalizacjê");
 								mCallTaxiButton.setEnabled(false);
+								mCheckPriceButton.setEnabled(false);
+								mCheckTimeButton.setEnabled(false);
 							}
 						}
 					}
@@ -176,6 +183,10 @@ public class CallTaxiPanel extends JPanel
 
 				lvDialog.setVisible(true);
 			}
+			else if (mCheckTimeButton.equals(evt.getSource()))
+			{
+				new OrderTaxiProcess(mCoordinates[0], mCoordinates[1], Const.ORDER_OP_ASK_FOR_TIME).process();
+			}
 			else if (mCallTaxiButton.equals(evt.getSource()))
 			{
 				int lvWynik = JOptionPane.showOptionDialog(mPanel, "Czy na pewno chcesz zamówiæ taksówkê?", "Potwierdzenie zamówienia",
@@ -183,7 +194,7 @@ public class CallTaxiPanel extends JPanel
 
 				if (lvWynik == 0)
 				{
-					new OrderTaxiProcess(mCoordinates[0], mCoordinates[1]).process();
+					new OrderTaxiProcess(mCoordinates[0], mCoordinates[1], Const.ORDER_OP_ORDER).process();
 				}
 			}
 		}
