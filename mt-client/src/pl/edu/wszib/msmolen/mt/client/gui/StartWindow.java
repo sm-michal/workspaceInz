@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -21,6 +23,7 @@ import javax.swing.JTextField;
 
 import pl.edu.wszib.msmolen.mt.client.process.LoginProcess;
 import pl.edu.wszib.msmolen.mt.client.process.RegisterProcess;
+import pl.edu.wszib.msmolen.mt.client.utils.ClientProperties;
 import pl.edu.wszib.msmolen.mt.client.utils.TokenManager;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.auth.User;
@@ -91,12 +94,32 @@ public class StartWindow extends JFrame
 		mMainPanel.setLocation(5, 5);
 		mMainPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
-		mLoginField = new JTextField("Login");
+		String lvLogin = ClientProperties.getUserLogin();
+
+		mLoginField = new JTextField(lvLogin != null && lvLogin.trim().length() > 0 ? lvLogin : "Login");
 		mLoginField.setSize(200, 30);
 		mLoginField.setLocation(10, 10);
+		mLoginField.addFocusListener(new FocusAdapter()
+		{
+			@Override
+			public void focusGained(FocusEvent e)
+			{
+				if ("Login".equals(mLoginField.getText()))
+					mLoginField.setText("");
+			}
+
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				if (mLoginField.getText().trim().length() == 0)
+					mLoginField.setText("Login");
+			}
+		});
 		mMainPanel.add(mLoginField);
 
-		mPassword = new JPasswordField("Has³o");
+		String lvPassword = ClientProperties.getUserPassword();
+
+		mPassword = new JPasswordField(lvPassword != null && lvPassword.length() > 0 ? ClientProperties.getUserPassword() : "");
 		mPassword.setSize(200, 30);
 		mPassword.setLocation(10, 50);
 		mMainPanel.add(mPassword);
@@ -164,11 +187,23 @@ public class StartWindow extends JFrame
 			{
 				new LoginProcess(mLoginField.getText(), mPassword.getPassword()).process();
 				showProperWindow(UserManager.getInstance().getUser());
+
+				if (UserManager.getInstance().getUser() != null && mRememberMeCheck.isSelected())
+				{
+					ClientProperties.setUserLogin(mLoginField.getText());
+					ClientProperties.setUserPassword(new String(mPassword.getPassword()));
+				}
 			}
 			else if (mRegisterButton.equals(evt.getSource()))
 			{
 				new RegisterProcess(mLoginField.getText(), mPassword.getPassword()).process();
 				showProperWindow(UserManager.getInstance().getUser());
+
+				if (UserManager.getInstance().getUser() != null && mRememberMeCheck.isSelected())
+				{
+					ClientProperties.setUserLogin(mLoginField.getText());
+					ClientProperties.setUserPassword(new String(mPassword.getPassword()));
+				}
 			}
 			else if (mCallTaxiButton.equals(evt.getSource()))
 			{

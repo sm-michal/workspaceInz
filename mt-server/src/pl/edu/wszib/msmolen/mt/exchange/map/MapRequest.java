@@ -9,19 +9,18 @@ public class MapRequest
 {
 	private static final String MAP_ADDRESS = "https://maps.googleapis.com/maps/api/staticmap?center=50.061781,19.937242&size=640x640&zoom=15&scale=1";
 
-	public static File getMapImage()
+	public static void downloadMapImage(File pmDestinationFile)
 	{
-		File lvOutputFile = null;
-
 		InputStream lvIS = null;
 		FileOutputStream lvFOS = null;
 		try
 		{
 			lvIS = new URL(MAP_ADDRESS).openStream();
 
-			lvOutputFile = File.createTempFile("mapa", ".jpg");
+			if (!pmDestinationFile.exists())
+				pmDestinationFile.createNewFile();
 
-			lvFOS = new FileOutputStream(lvOutputFile);
+			lvFOS = new FileOutputStream(pmDestinationFile);
 
 			byte[] lvTmpTab = new byte[2048];
 			int lvRead;
@@ -52,7 +51,5 @@ public class MapRequest
 				{
 				}
 		}
-
-		return lvOutputFile;
 	}
 }

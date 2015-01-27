@@ -3,6 +3,7 @@ package pl.edu.wszib.msmolen.mt.client;
 import javax.swing.SwingUtilities;
 
 import pl.edu.wszib.msmolen.mt.client.gui.StartWindow;
+import pl.edu.wszib.msmolen.mt.client.utils.ClientUtils;
 import pl.edu.wszib.msmolen.mt.client.utils.SSLUtils;
 import pl.edu.wszib.msmolen.mt.client.utils.TokenManager;
 
@@ -15,6 +16,8 @@ public class Main
 
 		try
 		{
+			ClientUtils.initializeWorkDirs();
+
 			TokenManager.getInstance().obtainToken();
 
 			SwingUtilities.invokeLater(new Runnable()

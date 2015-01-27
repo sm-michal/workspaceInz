@@ -30,6 +30,7 @@ public class CheckOrdersServlet extends BasicExchangeServlet
 		File lvMapFile = null;
 		try
 		{
+			lvMapFile = File.createTempFile("orderMap", ".dat");
 			int lvDriverId = (int) pmObjects[0];
 			Orders lvOrders = getActualOrder(lvDriverId);
 
@@ -38,7 +39,7 @@ public class CheckOrdersServlet extends BasicExchangeServlet
 			lvOOS.writeObject(lvOrders != null ? lvOrders : Const.MESSAGE_NOTHING);
 			if (lvOrders != null)
 			{
-				lvMapFile = MapRequest.getMapImage();
+				MapRequest.downloadMapImage(lvMapFile);
 				lvOOS.writeObject(Files.readAllBytes(lvMapFile.toPath()));
 			}
 		}

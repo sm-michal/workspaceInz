@@ -17,5 +17,8 @@ public class Const
 	public static final String ORDER_OP_ORDER = "orderTaxi";
 	public static final String ORDER_OP_ASK_FOR_TIME = "askForTime";
 
+	public static final String MAP_CURRENT = "actualMap";
+	public static final String MAP_UPDATED = "updatedMap";
+
 	public static final String MESSAGE_NOTHING = "NOTHING_TO_DO";
 }
