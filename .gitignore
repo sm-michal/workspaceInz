@@ -23,3 +23,5 @@ tmp/
 # PDT-specific
 .buildpath
 
+mt-client/data/map.dat
+mt-client/data/settings.conf
