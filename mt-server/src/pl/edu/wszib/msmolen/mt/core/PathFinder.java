@@ -1,5 +1,6 @@
 package pl.edu.wszib.msmolen.mt.core;
 
+import java.awt.Point;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -25,7 +26,7 @@ public class PathFinder
 
 	private int matrixSize;
 
-	private static PathFinder instance;
+	private static PathFinder instance = new PathFinder();
 
 	private static PathFinder getInstance()
 	{
@@ -111,8 +112,8 @@ public class PathFinder
 
 		pathsLengthsMatrix = createFinalMatrix(matrixD, matrixS);
 
-		for (int i = 0; i < matrixSize; i++)
-			for (int j = 0; j < matrixSize; j++)
+		for (int i = 1; i <= matrixSize; i++)
+			for (int j = 1; j <= matrixSize; j++)
 				if (i != j)
 				{
 					List<Integer> lvPath = new ArrayList<Integer>();
@@ -125,7 +126,7 @@ public class PathFinder
 
 	private Integer[][] createEdgesMatrix()
 	{
-		Integer[][] lvMatrix = new Integer[matrixSize][matrixSize];
+		Integer[][] lvMatrix = new Integer[matrixSize + 1][matrixSize + 1];
 
 		for (Crossing crossing : crossings)
 		{
@@ -153,7 +154,7 @@ public class PathFinder
 
 	private Integer[][] createNeighborhoodMatrix()
 	{
-		Integer[][] lvMatrix = new Integer[matrixSize][matrixSize];
+		Integer[][] lvMatrix = new Integer[matrixSize + 1][matrixSize + 1];
 		for (Crossing crossing : crossings)
 		{
 			for (Integer neighbor : crossing.getNeighbors())
@@ -165,12 +166,12 @@ public class PathFinder
 	private Integer[][] createFinalMatrix(Integer[][] pmStartMatrix, Integer[][] pmNeighborhoodMatrix)
 	{
 		Integer[][] lvStartMatrix = pmStartMatrix.clone();
-		Integer[][] lvFinalMatrix = new Integer[matrixSize][matrixSize];
+		Integer[][] lvFinalMatrix = new Integer[matrixSize + 1][matrixSize + 1];
 
-		for (int k = 0; k < matrixSize; k++)
+		for (int k = 1; k <= matrixSize; k++)
 		{
-			for (int i = 0; i < matrixSize; i++)
-				for (int j = 0; j < matrixSize; j++)
+			for (int i = 1; i <= matrixSize; i++)
+				for (int j = 1; j <= matrixSize; j++)
 				{
 					if (lvStartMatrix[i][j] > lvStartMatrix[i][k] + lvStartMatrix[k][j])
 					{
@@ -213,5 +214,23 @@ public class PathFinder
 	public static List<Integer> getPath(Integer pmStart, Integer pmEnd)
 	{
 		return getInstance().pathsMap.get(pmStart + "_" + pmEnd);
+	}
+
+	public static Crossing getClosestCrosing(double pmLattitude, double pmLongitude)
+	{
+		Crossing lvClosest = null;
+		double lvClosestDistance = Double.MAX_VALUE;
+
+		for (Crossing crossing : instance.crossings)
+		{
+			double lvDistance = Point.distance(pmLattitude, pmLongitude, crossing.getLattitude(), crossing.getLongitude());
+			if (lvDistance < lvClosestDistance)
+			{
+				lvClosestDistance = lvDistance;
+				lvClosest = crossing;
+			}
+		}
+
+		return lvClosest;
 	}
 }

@@ -41,7 +41,7 @@ public class Location
 	 * @param pmY
 	 * @return szerokosc geograficzna
 	 */
-	public static double calculateLattitude(int pmY)
+	public static double calculateLatitude(int pmY)
 	{
 		double lvStartY = lattitudeToY(LATTITUDE);
 		double lvEndY = lvStartY + (pmY - MAP_CENTER_Y) * Math.pow(2, 28 - 7 - ZOOM);

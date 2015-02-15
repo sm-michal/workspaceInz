@@ -21,11 +21,6 @@ public class Crossing
 		neighbors = createSetFromString(pmNeighbors);
 	}
 
-	public Pattern getSplitPattern()
-	{
-		return splitPattern;
-	}
-
 	public int getId()
 	{
 		return id;

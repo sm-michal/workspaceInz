@@ -31,7 +31,7 @@ public class ChooseLocationDialog extends JDialog
 
 	private final ActionListener mActionListener = new ButtonActionListener();
 
-	private Double mLattitude = null;
+	private Double mLatitude = null;
 	private Double mLongitude = null;
 
 	private Point mLocation = null;
@@ -89,16 +89,16 @@ public class ChooseLocationDialog extends JDialog
 	{
 		if (pmCoordinates != null)
 		{
-			mLongitude = pmCoordinates[0];
-			mLattitude = pmCoordinates[1];
+			mLatitude = pmCoordinates[0];
+			mLongitude = pmCoordinates[1];
 
-			mLocation = new Point(Location.calculateX(mLongitude), Location.calculateY(mLattitude));
+			mLocation = new Point(Location.calculateX(mLongitude), Location.calculateY(mLatitude));
 		}
 	}
 
 	public double[] getCoordinates()
 	{
-		return mLattitude == null || mLongitude == null ? null : new double[] { mLattitude, mLongitude };
+		return mLatitude == null || mLongitude == null ? null : new double[] { mLatitude, mLongitude };
 	}
 
 	public void loadMapOntoWindow()
@@ -113,7 +113,7 @@ public class ChooseLocationDialog extends JDialog
 		{
 			if (mCloseButton.equals(evt.getSource()))
 			{
-				mLattitude = null;
+				mLatitude = null;
 				mLongitude = null;
 
 				ChooseLocationDialog.this.dispose();
@@ -131,8 +131,8 @@ public class ChooseLocationDialog extends JDialog
 		@Override
 		public void mouseReleased(MouseEvent e)
 		{
-			mLattitude = Location.calculateLongitude(e.getX());
-			mLongitude = Location.calculateLattitude(e.getY());
+			mLatitude = Location.calculateLatitude(e.getY());
+			mLongitude = Location.calculateLongitude(e.getX());
 
 			mLocation = new Point(e.getX(), e.getY());
 
