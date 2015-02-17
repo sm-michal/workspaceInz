@@ -46,7 +46,7 @@ public class CheckOrdersProcess extends AbstractProcess
 			{
 				mDriverPanel.stopTimer();
 
-				mDriverPanel.loadMapOntoPanel((byte[]) pmInput.readObject());
+				mDriverPanel.loadMapOntoPanel((byte[]) pmInput.readObject(), (Orders) lvResult);
 			}
 
 		}

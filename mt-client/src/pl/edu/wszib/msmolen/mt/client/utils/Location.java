@@ -5,6 +5,10 @@ public class Location
 	public static final double LATTITUDE = 50.061781;
 	public static final double LONGITUDE = 19.937242;
 
+	/** Stale do konwersji stopni na kilometry, wyznaczone doswiadczalnie **/
+	private static final double LAT_TO_KILOMETRES = 0.0089619;
+	private static final double LON_TO_KILOMETRES = 0.0137931;
+
 	private static final int ZOOM = 15;
 
 	private static final double POWER_OF_2 = Math.pow(2, 7 + ZOOM);
@@ -111,5 +115,27 @@ public class Location
 	private static int longitudeToX(double pmLongitude)
 	{
 		return (int) Math.round(GLOBE_OFFSET + GLOBE_RADIUS * pmLongitude * P);
+	}
+
+	/**
+	 * Przelicza odleglosc w stopniach szerokosci geograficznej na metry
+	 * 
+	 * @param pmDLat
+	 * @return
+	 */
+	public static int deltaLatitudeToMetres(double pmDLat)
+	{
+		return (int) (pmDLat / LAT_TO_KILOMETRES * 1000);
+	}
+
+	/**
+	 * Przelicza odleglosc w stopniach dlugosci geograficznej na metry
+	 * 
+	 * @param pmDLon
+	 * @return
+	 */
+	public static int deltaLongitudeToMetres(double pmDLon)
+	{
+		return (int) (pmDLon / LON_TO_KILOMETRES * 1000);
 	}
 }

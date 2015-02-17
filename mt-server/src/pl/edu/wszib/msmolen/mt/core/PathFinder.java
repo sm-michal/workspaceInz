@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.edu.wszib.msmolen.mt.common.utils.Pair;
 import pl.edu.wszib.msmolen.mt.core.model.Crossing;
 import pl.edu.wszib.msmolen.mt.core.model.Street;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
@@ -17,6 +18,7 @@ import pl.edu.wszib.msmolen.mt.db.DbUtils;
 public class PathFinder
 {
 	private List<Crossing> crossings;
+	private final Map<Integer, Crossing> crossingsMap = new HashMap<Integer, Crossing>();
 
 	private List<Street> streets;
 
@@ -52,6 +54,9 @@ public class PathFinder
 			streets = loadStreets(lvConnection);
 
 			matrixSize = crossings.size();
+
+			for (Crossing cr : crossings)
+				crossingsMap.put(cr.getId(), cr);
 		}
 		catch (Exception e)
 		{
@@ -142,7 +147,7 @@ public class PathFinder
 							street.getEndCrossingId() == crossing.getId() &&
 							street.getStartCrossingId() == neighbor && !street.isOneWay())
 					{
-						lvMatrix[crossing.getId()][neighbor] = (int) street.getLength() * 1000;
+						lvMatrix[crossing.getId()][neighbor] = (int) (street.getLength() * 1000);
 						break;
 					}
 				}
@@ -208,12 +213,32 @@ public class PathFinder
 
 	public static int getRideTime(Integer pmStart, Integer pmEnd)
 	{
-		return getInstance().pathsLengthsMatrix[pmStart][pmEnd];
+		return getInstance().pathsLengthsMatrix[pmStart][pmEnd] / 200;
 	}
 
-	public static List<Integer> getPath(Integer pmStart, Integer pmEnd)
+	private List<Integer> getPath(Integer pmStart, Integer pmEnd)
 	{
-		return getInstance().pathsMap.get(pmStart + "_" + pmEnd);
+		return pathsMap.get(pmStart + "_" + pmEnd);
+	}
+
+	public static List<Pair<Double>> getPathForDriver(double pmStartLat, double pmStartLong, double pmEndLat, double pmEndLong)
+	{
+		List<Pair<Double>> lvResult = new ArrayList<Pair<Double>>();
+
+		lvResult.add(new Pair<Double>(pmStartLat, pmStartLong));
+
+		Crossing lvStart = getClosestCrosing(pmStartLat, pmStartLong);
+		Crossing lvEnd = getClosestCrosing(pmEndLat, pmEndLong);
+
+		for (Integer crossingId : getInstance().getPath(lvStart.getId(), lvEnd.getId()))
+		{
+			Crossing cr = getInstance().crossingsMap.get(crossingId);
+			lvResult.add(new Pair<Double>(cr.getLattitude(), cr.getLongitude()));
+		}
+
+		lvResult.add(new Pair<Double>(pmEndLat, pmEndLong));
+
+		return lvResult;
 	}
 
 	public static Crossing getClosestCrosing(double pmLattitude, double pmLongitude)

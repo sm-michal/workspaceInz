@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import pl.edu.wszib.msmolen.mt.common.utils.exceptions.ApplicationException;
+import pl.edu.wszib.msmolen.mt.core.model.Crossing;
 import pl.edu.wszib.msmolen.mt.db.DbUtils;
 
 public class OrdersProvider
@@ -74,6 +75,8 @@ public class OrdersProvider
 
 	private static int calculateArriveTime(double pmSourceLattitude, double pmSourceLongitude, double pmDestinationLattitude, double pmDestinationLongitude)
 	{
-		return 1;
+		Crossing lvSource = PathFinder.getClosestCrosing(pmSourceLattitude, pmSourceLongitude);
+		Crossing lvDestination = PathFinder.getClosestCrosing(pmDestinationLattitude, pmDestinationLongitude);
+		return PathFinder.getRideTime(lvSource.getId(), lvDestination.getId());
 	}
 }

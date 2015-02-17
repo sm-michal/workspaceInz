@@ -1,6 +1,9 @@
 package pl.edu.wszib.msmolen.mt.client.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Timer;
@@ -17,7 +20,11 @@ import javax.swing.SwingConstants;
 
 import pl.edu.wszib.msmolen.mt.client.process.CheckOrdersProcess;
 import pl.edu.wszib.msmolen.mt.client.process.LogoutProcess;
+import pl.edu.wszib.msmolen.mt.client.process.UpdateDriverLocationProcess;
+import pl.edu.wszib.msmolen.mt.client.utils.Location;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
+import pl.edu.wszib.msmolen.mt.common.utils.Orders;
+import pl.edu.wszib.msmolen.mt.common.utils.Pair;
 
 /**
  * Panel taksowkarza. Wyswietla informacje o przychodzacych zgloszeniach.
@@ -52,6 +59,8 @@ public class DriverPanel extends JPanel
 
 	private Timer mCheckOrdersTimer;
 
+	private Orders mCurrentOrder;
+
 	public DriverPanel(JLayeredPane pmParent)
 	{
 		mParent = pmParent;
@@ -71,9 +80,10 @@ public class DriverPanel extends JPanel
 		this.add(mBackButton);
 
 		mNothingToDoLabel = new JLabel("Nie ma nowych zg³oszeñ");
-		mNothingToDoLabel.setSize(getWidth(), 30);
+		mNothingToDoLabel.setSize(getWidth(), getHeight());
 		mNothingToDoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		mNothingToDoLabel.setLocation(5, 150);
+		mNothingToDoLabel.setLocation(5, 5);
+		mNothingToDoLabel.setOpaque(true);
 		mNothingToDoLabel.setVisible(false);
 		this.add(mNothingToDoLabel);
 
@@ -103,7 +113,36 @@ public class DriverPanel extends JPanel
 		mDestinationText.setLocation(5, 60);
 		mOrderPanel.add(mDestinationText);
 
-		mMapLabel = new JLabel();
+		mMapLabel = new JLabel()
+		{
+
+			private static final long serialVersionUID = 8016282349933470517L;
+
+			@Override
+			protected void paintComponent(Graphics g)
+			{
+				super.paintComponent(g);
+
+				if (mCurrentOrder != null)
+				{
+					Graphics2D g2 = (Graphics2D) g;
+					g2.setStroke(new BasicStroke(3));
+					g2.setColor(Color.RED);
+
+					for (int i = 1; i < mCurrentOrder.getPath().size(); i++)
+					{
+						Pair<Double> start = mCurrentOrder.getPath().get(i - 1);
+						Pair<Double> end = mCurrentOrder.getPath().get(i);
+						g2.drawLine(
+								Location.calculateX(start.getSecond()),
+								Location.calculateY(start.getFirst()),
+								Location.calculateX(end.getSecond()),
+								Location.calculateY(end.getFirst())
+								);
+					}
+				}
+			}
+		};
 
 		mScrollMapPane = new JScrollPane(mMapLabel);
 		mScrollMapPane.setSize(getWidth() - 10, getHeight() - 120);
@@ -117,7 +156,8 @@ public class DriverPanel extends JPanel
 	 */
 	public void showNothingToDoLabel()
 	{
-		// mNothingToDoLabel.setVisible(true);
+		mNothingToDoLabel.setVisible(true);
+		mCurrentOrder = null;
 	}
 
 	/**
@@ -149,9 +189,73 @@ public class DriverPanel extends JPanel
 	 * 
 	 * @param pmImageFile
 	 */
-	public void loadMapOntoPanel(byte[] pmData)
+	public void loadMapOntoPanel(byte[] pmData, Orders pmOrders)
 	{
+		mNothingToDoLabel.setVisible(false);
+
 		mMapLabel.setIcon(new ImageIcon(pmData));
+		mCurrentOrder = pmOrders;
+		mMapLabel.repaint();
+		if (pmOrders != null && pmOrders.getPath() != null)
+		{
+			mScrollMapPane.getVerticalScrollBar().setValue(Location.calculateY(pmOrders.getPath().get(0).getFirst()) - mScrollMapPane.getHeight() / 2);
+			mScrollMapPane.getHorizontalScrollBar().setValue(Location.calculateX(pmOrders.getPath().get(0).getSecond()) - mScrollMapPane.getWidth() / 2);
+
+			startRideTimer();
+		}
+	}
+
+	private void startRideTimer()
+	{
+		Timer lvTimer = new Timer();
+		lvTimer.scheduleAtFixedRate(new TimerTask()
+		{
+			int mNextIndex = 1;
+
+			Pair<Double> mCurrent = mCurrentOrder.getPath().get(0);
+
+			@Override
+			public void run()
+			{
+				Pair<Double> lvNext = mCurrentOrder.getPath().get(mNextIndex);
+
+				double lvVerticalDistance = lvNext.getFirst() - mCurrent.getFirst();
+				double lvHorizontalDistance = lvNext.getSecond() - mCurrent.getSecond();
+
+				int lvVMetres = Location.deltaLatitudeToMetres(lvVerticalDistance);
+				int lvHMetres = Location.deltaLongitudeToMetres(lvHorizontalDistance);
+
+				double lvDistance = Math.sqrt(lvVMetres * lvVMetres + lvHMetres * lvHMetres);
+				if (lvDistance < 20)
+				{
+					mCurrent = mCurrentOrder.getPath().get(mNextIndex);
+
+					if (mNextIndex + 1 < mCurrentOrder.getPath().size())
+					{
+						mNextIndex++;
+					}
+					else
+					{
+						this.cancel();
+					}
+				}
+				else
+				{
+					double lvFactor = 20.0 / lvDistance;
+
+					double lvNewLat = mCurrent.getFirst() + lvVerticalDistance * lvFactor;
+					double lvNewLon = mCurrent.getSecond() + lvHorizontalDistance * lvFactor;
+
+					mCurrent = new Pair<Double>(lvNewLat, lvNewLon);
+
+					mScrollMapPane.getVerticalScrollBar().setValue(Location.calculateY(lvNewLat) - mScrollMapPane.getHeight() / 2);
+					mScrollMapPane.getHorizontalScrollBar().setValue(Location.calculateX(lvNewLon) - mScrollMapPane.getWidth() / 2);
+				}
+
+				new UpdateDriverLocationProcess(mCurrent.getFirst(), mCurrent.getSecond()).process();
+
+			}
+		}, 6 * 1000, 6 * 1000);
 	}
 
 	private class ButtonActionListener implements ActionListener
