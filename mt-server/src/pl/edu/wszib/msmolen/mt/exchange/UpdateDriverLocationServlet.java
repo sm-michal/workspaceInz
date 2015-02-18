@@ -26,16 +26,28 @@ public class UpdateDriverLocationServlet extends BasicExchangeServlet implements
 		int lvDriverId = (int) pmObjects[0];
 		double lvLatitude = (double) pmObjects[1];
 		double lvLongitude = (double) pmObjects[2];
+		boolean lvFinished = (boolean) pmObjects[3];
 
 		ObjectOutputStream lvOOS = null;
+		Connection lvConnection = null;
 		try
 		{
-			updateDriverLocation(lvDriverId, lvLatitude, lvLongitude);
+			lvConnection = DbUtils.getConnection();
+
+			updateDriverLocation(lvConnection, lvDriverId, lvLatitude, lvLongitude);
+
+			if (lvFinished)
+			{
+				increaseOrderStatus(lvConnection, lvDriverId);
+			}
+
 			lvOOS = new ObjectOutputStream(pmResponse.getOutputStream());
 			lvOOS.writeObject(Const.MESSAGE_OK);
 		}
 		finally
 		{
+			DbUtils.close(lvConnection);
+
 			if (lvOOS != null)
 				try
 				{
@@ -47,14 +59,12 @@ public class UpdateDriverLocationServlet extends BasicExchangeServlet implements
 		}
 	}
 
-	private void updateDriverLocation(int pmDriverId, double pmLat, double pmLon)
+	private void updateDriverLocation(Connection pmConnection, int pmDriverId, double pmLat, double pmLon)
 	{
-		Connection lvConnection = null;
 		PreparedStatement lvStmt = null;
 		try
 		{
-			lvConnection = DbUtils.getConnection();
-			lvStmt = lvConnection.prepareStatement("UPDATE MT_TAKSOWKARZE SET POLOZENIE_Y = ?, POLOZENIE_X = ? WHERE ID = ?");
+			lvStmt = pmConnection.prepareStatement("UPDATE MT_TAKSOWKARZE SET POLOZENIE_Y = ?, POLOZENIE_X = ? WHERE ID = ?");
 			lvStmt.setDouble(1, pmLat);
 			lvStmt.setDouble(2, pmLon);
 			lvStmt.setInt(3, pmDriverId);
@@ -66,7 +76,27 @@ public class UpdateDriverLocationServlet extends BasicExchangeServlet implements
 		}
 		finally
 		{
-			DbUtils.close(lvStmt, lvConnection);
+			DbUtils.close(lvStmt);
+		}
+	}
+
+	private void increaseOrderStatus(Connection pmConnection, int pmDriverId)
+	{
+		PreparedStatement lvStmt = null;
+		try
+		{
+			lvStmt = pmConnection.prepareStatement("UPDATE MT_ZAMOWIENIA SET STATUS = TO_CHAR(TO_NUMBER(STATUS,'9')+1,'9') "
+					+ "WHERE TAKSOWKARZ_ID = ? AND STATUS <> '4' ORDER BY ID DESC");
+			lvStmt.setInt(1, pmDriverId);
+			lvStmt.executeUpdate();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DbUtils.close(lvStmt);
 		}
 	}
 }

@@ -11,11 +11,13 @@ public class UpdateDriverLocationProcess extends AbstractProcess
 {
 	private final Double mLatitude;
 	private final Double mLongitude;
+	private final Boolean mFinished;
 
-	public UpdateDriverLocationProcess(Double pmLatitude, Double pmLongitude)
+	public UpdateDriverLocationProcess(Double pmLatitude, Double pmLongitude, boolean pmFinished)
 	{
 		mLatitude = pmLatitude;
 		mLongitude = pmLongitude;
+		mFinished = pmFinished;
 	}
 
 	@Override
@@ -30,6 +32,7 @@ public class UpdateDriverLocationProcess extends AbstractProcess
 		pmOutput.writeObject(UserManager.getInstance().getUser().getForeignId());
 		pmOutput.writeObject(mLatitude);
 		pmOutput.writeObject(mLongitude);
+		pmOutput.writeObject(mFinished);
 	}
 
 	@Override

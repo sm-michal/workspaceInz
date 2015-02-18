@@ -18,6 +18,8 @@ public class OrderTaxiProcess extends AbstractProcess
 
 	private final String mOperation;
 
+	private int mOrderId;
+
 	public OrderTaxiProcess(double pmLattitude, double pmLongitude, String pmOperation)
 	{
 		mLattitude = pmLattitude;
@@ -51,11 +53,21 @@ public class OrderTaxiProcess extends AbstractProcess
 					(Const.ORDER_OP_ORDER.equals(mOperation) ? "Taksówka zosta³a zamówiona. " : "") + "Czas oczekiwania na przybycie: "
 							+ ClientUtils.getTimeMessage(lvTime) + ".", "Informacja",
 					JOptionPane.INFORMATION_MESSAGE);
+
+			if (Const.ORDER_OP_ORDER.equals(mOperation))
+			{
+				mOrderId = (int) pmInput.readObject();
+			}
 		}
 		else
 		{
 			throw (Exception) pmInput.readObject();
 		}
+	}
+
+	public int getOrderId()
+	{
+		return mOrderId;
 	}
 
 }

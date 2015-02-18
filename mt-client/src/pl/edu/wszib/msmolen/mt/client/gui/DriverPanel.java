@@ -217,6 +217,8 @@ public class DriverPanel extends JPanel
 			@Override
 			public void run()
 			{
+				boolean lvFinished = false;
+
 				Pair<Double> lvNext = mCurrentOrder.getPath().get(mNextIndex);
 
 				double lvVerticalDistance = lvNext.getFirst() - mCurrent.getFirst();
@@ -237,6 +239,7 @@ public class DriverPanel extends JPanel
 					else
 					{
 						this.cancel();
+						lvFinished = true;
 					}
 				}
 				else
@@ -252,7 +255,7 @@ public class DriverPanel extends JPanel
 					mScrollMapPane.getHorizontalScrollBar().setValue(Location.calculateX(lvNewLon) - mScrollMapPane.getWidth() / 2);
 				}
 
-				new UpdateDriverLocationProcess(mCurrent.getFirst(), mCurrent.getSecond()).process();
+				new UpdateDriverLocationProcess(mCurrent.getFirst(), mCurrent.getSecond(), lvFinished).process();
 
 			}
 		}, 6 * 1000, 6 * 1000);

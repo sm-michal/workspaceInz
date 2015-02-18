@@ -7,6 +7,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,6 +20,7 @@ import javax.swing.JTextField;
 
 import pl.edu.wszib.msmolen.mt.client.process.LogoutProcess;
 import pl.edu.wszib.msmolen.mt.client.process.OrderTaxiProcess;
+import pl.edu.wszib.msmolen.mt.client.process.WaitForTaxiProcess;
 import pl.edu.wszib.msmolen.mt.client.utils.UserManager;
 import pl.edu.wszib.msmolen.mt.common.auth.User;
 import pl.edu.wszib.msmolen.mt.common.exchange.Const;
@@ -43,6 +46,7 @@ public class CallTaxiPanel extends JPanel
 	private final ActionListener listener;
 
 	private double[] mCoordinates;
+	private int mOrderId;
 
 	public CallTaxiPanel(JLayeredPane pmParent)
 	{
@@ -194,7 +198,25 @@ public class CallTaxiPanel extends JPanel
 
 				if (lvWynik == 0)
 				{
-					new OrderTaxiProcess(mCoordinates[0], mCoordinates[1], Const.ORDER_OP_ORDER).process();
+					OrderTaxiProcess process = new OrderTaxiProcess(mCoordinates[0], mCoordinates[1], Const.ORDER_OP_ORDER);
+					process.process();
+					mOrderId = process.getOrderId();
+
+					Timer lvTimer = new Timer();
+					lvTimer.scheduleAtFixedRate(new TimerTask()
+					{
+						@Override
+						public void run()
+						{
+							WaitForTaxiProcess process = new WaitForTaxiProcess(mOrderId);
+							process.process();
+							if ("2".equals(process.getOrderStatus()))
+							{
+								JOptionPane.showMessageDialog(mPanel, "Taksówka przyjecha³a. Wska¿ miejsce docelowe.");
+								this.cancel();
+							}
+						}
+					}, 0, 5 * 1000);
 				}
 			}
 		}
