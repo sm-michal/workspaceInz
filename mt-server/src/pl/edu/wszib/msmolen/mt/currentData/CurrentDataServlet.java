@@ -62,6 +62,7 @@ public class CurrentDataServlet extends HttpServlet
 			lvConnection = DbUtils.getConnection();
 
 			lvDrivers = getDrivers(lvConnection);
+			lvClients = getClients(lvConnection);
 		}
 		catch (Exception e)
 		{
@@ -96,6 +97,27 @@ public class CurrentDataServlet extends HttpServlet
 			DbUtils.close(lvResult, lvStmt);
 		}
 		return lvDrivers;
+	}
+
+	private List<Client> getClients(Connection pmConnection) throws Exception
+	{
+		List<Client> lvClients = new ArrayList<Client>();
+		PreparedStatement lvStmt = null;
+		ResultSet lvResult = null;
+		try
+		{
+			lvStmt = pmConnection.prepareStatement("SELECT ID, START_Y, START_X FROM MT_ZAMOWIENIA WHERE STATUS IN ('1','2')");
+			lvResult = lvStmt.executeQuery();
+			while (lvResult.next())
+			{
+				lvClients.add(new Client(lvResult.getInt(1), new double[] { lvResult.getDouble(2), lvResult.getDouble(3) }));
+			}
+		}
+		finally
+		{
+			DbUtils.close(lvResult, lvStmt);
+		}
+		return lvClients;
 	}
 
 }

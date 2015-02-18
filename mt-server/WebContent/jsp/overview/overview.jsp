@@ -61,6 +61,25 @@ function refreshMap() {
 						driver.setPosition(new google.maps.LatLng(drivers[i].coordinates[0],drivers[i].coordinates[1]));
 					}
 				}
+				
+				var clients = responseObj.clients;
+				for (var i = 0; i < clients.length; i++)
+				{
+					var client = gvMarkers['c' + clients[i].id];
+					if (client == 'undefined' || client == null)
+					{
+						client = new google.maps.Marker({
+							position: new google.maps.LatLng(clients[i].coordinates[0],clients[i].coordinates[1]),
+							map: gvMap,
+							title: '',
+							icon: 'img/street-view-24.png'
+						});
+					}
+					else
+					{
+						client.setPosition(new google.maps.LatLng(clients[i].coordinates[0],clients[i].coordinates[1]));
+					}
+				}
 			}
 			setTimeout(refreshMap, 10000);
 		}
